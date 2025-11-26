@@ -21,6 +21,15 @@ class User extends Authenticatable
         'name',
         'phone',
     ];
+    public function bookings() {
+        return $this->hasMany(Booking::class);
+    }
+    public function chats() {
+        return $this->hasMany(Chat::class);
+    }
+    public function reviews() {
+        return $this->hasMany(Review::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
