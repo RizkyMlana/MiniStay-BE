@@ -1,15 +1,11 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Admin;
-
+use App\Models\OtpCode;
 
 class AuthController extends Controller
 {
@@ -27,8 +23,6 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        Auth::guard('admin')->login($admin);
-
         return response()->json([
             'message' => 'Admin registered successfully',
             'admin' => $admin,
@@ -36,71 +30,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function login(Request $request)
-    {
-        if ($request->has('phone') && $request->has('otp')) {
-            return $this->loginUserOtp($request);
-        }
-
-        if ($request->has('email') && $request->has('password')) {
-            return $this->adminLogin($request);
-        }
-
-        return response()->json([
-            'message' => 'Invalid login request'
-        ], 400);
-    }
-
-    public function logout(Request $request)
-    {
-        if (Auth::guard('admin')->check()) {
-            Auth::guard('admin')->logout();
-        }
-
-        if (Auth::guard('web')->check()) {
-            Auth::guard('web')->logout();
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Logout berhasil'
-        ]);
-    }
-
-    private function loginUserOtp(Request $request)
-    {
-        $request->validate([
-            'phone' => 'required',
-            'otp' => 'required',
-        ]);
-
-        $otp = DB::table('otp_codes')
-            ->where('phone', $request->phone)
-            ->where('code', $request->otp)
-            ->where('expires_at', '>', now())
-            ->first();
-
-        if (!$otp) {
-            return response()->json(['message' => 'OTP salah atau expired'], 401);
-        }
-
-        $user = User::where('phone', $request->phone)->first();
-
-        if (!$user) {
-            return response()->json(['message' => 'User tidak ditemukan'], 404);
-        }
-
-        DB::table('otp_codes')->where('phone', $request->phone)->delete();
-
-        Auth::guard('web')->login($user);
-
-        return response()->json([
-            'message' => 'User login successful',
-            'role' => 'user'
-        ]);
-    }
-
-    private function adminLogin(Request $request)
+    public function loginAdmin(Request $request)
     {
         $request->validate([
             'email'=> 'required|email',
@@ -119,25 +49,81 @@ class AuthController extends Controller
         return response()->json(['message' => 'Email atau password salah'], 401);
     }
 
-    public function generateOtp(Request $request){
+    public function generateOtp(Request $request)
+    {
         $request->validate([
-            'phone' => 'required',
+            'name' => 'required|max:25',
+            'phone' => 'required'
         ]);
+
+        $phone = $request->phone;
+        $name = $request->name;
+
+        $user = User::firstOrCreate(
+            ['phone' => $phone],
+            ['name' => $name]
+        );
+
         $otpCode = rand(100000, 999999);
 
-        DB::table('otp_codes')->updateOrInsert(
-            ['phone' => $request->phone],
-            [
-                'code' => $otpCode,
-                'expires_at' => now()->addMinutes(5)
-            ]
-        );
-        return response()->json([
-            'message'=> 'OTP generated',
-            'phone' => $request->phone,
-            'otp' => $otpCode,
-            'expires_in' => 300
+        OtpCode::where('phone', $phone)->delete();
+
+        OtpCode::create([
+            'phone' => $phone,
+            'code' => $otpCode,
+            'expires_at' => now()->addMinutes(5)
         ]);
-        
+
+        return response()->json([
+            'message' => 'OTP generated',
+            'otp_debug' => $otpCode
+        ]);
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'code' => 'required|digits:6',
+        ]);
+
+        $otp = OtpCode::where('phone', $request->phone)
+                    ->where('code', $request->code)
+                    ->first();
+
+        if (!$otp) {
+            return response()->json(['message' => 'OTP salah'], 400);
+        }
+
+        if (now()->greaterThan($otp->expires_at)) {
+            return response()->json(['message' => 'OTP kadaluarsa'], 400);
+        }
+
+        $user = User::where('phone', $request->phone)->first();
+
+        $otp->delete();
+
+        $token = $user->createToken('user_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login berhasil',
+            'token' => $token,
+            'user' => $user
+        ]);
+    }
+
+    public function logout(Request $request)
+    {
+        if (Auth::guard('admin')->check()) {
+            Auth::guard('admin')->logout();
+            return response()->json(['message' => 'Admin logout berhasil']);
+        }
+
+        if ($request->user()) {
+            $request->user()->currentAccessToken()->delete();
+            return response()->json(['message' => 'User logout berhasil']);
+        }
+
+        return response()->json(['message' => 'Tidak ada sesi login'], 400);
     }
 }

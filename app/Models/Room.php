@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
-use PhpParser\Node\Expr\Cast\Bool_;
 
 class Room extends Model
 {
@@ -19,7 +18,7 @@ class Room extends Model
     public function photos(){
         return $this->hasMany(RoomPhoto::class);
     }
-    public function available(){
+    public function availabilities(){
         return $this->hasMany(RoomAvailable::class);
     }
     public function bookings() {
