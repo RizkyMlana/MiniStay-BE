@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Room;
-use App\Models\RoomAvailable;
 
 class HotelController extends Controller
 {
@@ -40,46 +39,5 @@ class HotelController extends Controller
             'data'=> $room
         ]);
     }   
-    public function checkAvailability(Request $request){
-        $request->validate([
-            'room_id'=>'required|integer',
-            'date'=> 'required|date'
-        ]);
-        $available = RoomAvailable::where('room_id', $request->room_id)
-            ->where('date', $request->date)
-            ->where('status', 'available')
-            ->exist();
-        return response()->json([
-            'room_id'=>$request->room_id,
-            'date'=>$request->date,
-            'available'=>$available
-        ]);
-    }
-
-    public function searchAvailable(Request $request){
-        $request->validate([
-            'check_in'=> 'required|date',
-            'check_out'=> 'required|date|after:check_in'
-        ]);
-
-        $dates = [];
-        $start = strtotime($request->check_in);
-        $end = strtotime($request->check_out);
-
-        for ($d = $start; $d <= $end; $d += 86400){
-            $dates[] = date('Y-m-d', $d);
-        }
-
-        $room = Room::whereDoesntHave('availability', function($q) use ($dates){
-            $q->whereIn('date', $dates)
-                ->where('status', 'booked');
-        })->get();
-
-        return response()->json([
-            'message' => 'Available rooms',
-            'dates' => $dates,
-            'data' => $room
-        ]);
-    }
 
 }

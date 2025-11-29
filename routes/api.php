@@ -17,5 +17,3 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 Route::get('/room', [HotelController::class, 'index']);
 Route::get('/room/{id}', [HotelController::class, 'show']);
 
-Route::get('/room/check-available', [HotelController::class, 'checkAvailabilty']);
-Route::get('/room/search', [HotelController::class, 'searchAvailable']);
