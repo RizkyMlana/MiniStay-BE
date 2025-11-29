@@ -18,6 +18,9 @@ class Room extends Model
     public function photos(){
         return $this->hasMany(RoomPhoto::class);
     }
+    public function firstPhoto(){
+        return $this->hasOne(RoomPhoto::class)->orderBy('id', 'asc');
+    }
     public function availabilities(){
         return $this->hasMany(RoomAvailable::class);
     }

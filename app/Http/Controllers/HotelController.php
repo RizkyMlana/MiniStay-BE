@@ -15,6 +15,7 @@ class HotelController extends Controller
                         $q->where('status', 'available'); 
                     }
                 ])
+                ->with('firstPhoto:id,room_id,url')
                 ->get();
 
         return response()->json([
@@ -24,14 +25,16 @@ class HotelController extends Controller
     }
 
     public function show($id){
-        $room = Room::with(['availability' => function($q) {
-            $q->orderBy('date', 'asc');
-        }])
-        ->find($id);
-        if(!$room) {
-            return response()->json(['message' => 'Room not found'], 404);
-        }
+        $room = Room::with([
+            'photos',
+            'availabilities' => function($q) {
+                $q->orderBy('date', 'asc');
+            }
+        ])->find($id);
 
+        if(!$room) {
+            return response()->json(['message' => 'Room Not Found'], 404);
+        }
         return response()->json([
             'message'=>'Room detail',
             'data'=> $room
