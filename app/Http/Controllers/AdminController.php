@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\RoomAvailable;
+use App\Models\RoomPhoto;
 use Carbon\CarbonPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class AdminController extends Controller
 {    
@@ -150,6 +152,47 @@ class AdminController extends Controller
                 ->get();
         }
         return response()->json($data);
+    }
+    public function uploadRoomPhoto(Request $request, $roomId){
+        $request->validate([
+            'photo' => 'required|image|max:5000'
+        ]);
+
+        $file = $request->file('photo');
+        $fileName = 'room_ ' . $roomId . '_' . time() . '.' . $file->getClientOriginalExtension();
+
+        $fileContent = file_get_contents($file->getRealPath());
+
+        $supaUrl = env('SUPABASE_URL');
+        $supaBucket = env('SUPABASE_BUCKET');
+        $supaapiKey = env('SUPABASE_KEY');
+
+        $uploadUrl = "$supaUrl/storage/v1/object/$supaBucket/$fileName";
+
+        $response = Http::withHeaders([
+            'apiKey' => $supaapiKey,
+            'Authorization' => 'Bearer ' . $supaapiKey,
+            'Content-Type' => $file->getMimeType(),
+        ])->put($uploadUrl, $fileContent);
+
+        if(!$response->successful()) {
+            return response()->json([
+                'error' => 'Failed to upload',
+                'supabase_response' => $response->body()
+            ], 500);
+        }
+
+        $publicUrl = "$supaUrl/storage/v1/object/public/$supaBucket/$fileName";
+
+        RoomPhoto::create([
+            'room_id' => $roomId,
+            'url' => $publicUrl,
+        ]);
+
+        return response()->json([
+            'message' => 'Photo uploaded successfully',
+            'url' => $publicUrl
+        ]);
     }
     private function sendNotification($userId, $message){
         return true;
