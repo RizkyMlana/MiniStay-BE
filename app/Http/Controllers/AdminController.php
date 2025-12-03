@@ -6,7 +6,6 @@ use App\Models\Booking;
 use App\Models\Room;
 use App\Models\RoomAvailable;
 use App\Models\RoomPhoto;
-use Carbon\CarbonPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -197,7 +196,6 @@ class AdminController extends Controller
     private function sendNotification($userId, $message){
         return true;
     }
-
 
 
     private function generateDateRange($start, $end){
