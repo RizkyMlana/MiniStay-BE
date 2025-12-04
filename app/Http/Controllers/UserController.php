@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Room;
 
-class HotelController extends Controller
+class UserController extends Controller
 {
     public function index()
     {
@@ -38,6 +38,5 @@ class HotelController extends Controller
             'message'=>'Room detail',
             'data'=> $room
         ]);
-    }   
-
+    }
 }
