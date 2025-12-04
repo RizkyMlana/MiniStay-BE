@@ -9,26 +9,7 @@ use App\Models\OtpCode;
 
 class AuthController extends Controller
 {
-    public function registerAdmin(Request $request)
-    {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:admins,email',
-            'password' => 'required|min:6'
-        ]);
-
-        $admin = Admin::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        return response()->json([
-            'message' => 'Admin registered successfully',
-            'admin' => $admin,
-            'role' => 'admin'
-        ], 201);
-    }
+    
 
     public function loginAdmin(Request $request)
     {

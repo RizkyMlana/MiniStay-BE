@@ -14,15 +14,16 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('booking_id')->constrained()->onDelete('cascade');
-            $table->enum('payment_method', ['qris', 'va', 'ewallet'])->nullable(); 
-            $table->string('xendit_invoice_id')->nullable();
-            $table->enum('xendit_status', ['PENDING', 'PAID', 'EXPIRED', 'FAILED'])->nullable(); 
-            $table->string('invoice_url')->nullable(); 
-            $table->decimal('amount', 12, 2);
-            $table->json('raw_response')->nullable();
-            $table->timestamps();
-
-            $table->index('xendit_invoice_id');
+            $table->integer('amount_requested');
+            $table->integer('amount_paid')->nullable();
+            $table->string('bank_name')->nullable();
+            $table->string('bank_account')->nullable();
+            $table->string('bank_owner')->nullable();
+            $table->string('proof_url')->nullable();
+            $table->enum('status', ['pending', 'waiting_confirmation', 'paid', 'failed'])->default('pending');
+            $table->datetime('expired_at')->nullable();
+            $table->timestamp('paid_at')->nullable();
+            $table->datetimes();
         });
     }
 
