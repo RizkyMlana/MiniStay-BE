@@ -135,31 +135,4 @@ class UserController extends Controller
         ]);
     }
 
-    public function sendChat(Request $request){
-        $request->validate([
-            'message' => 'required|string'
-        ]);
-
-        $chat = Chat::create([
-            'user_id' => auth()->id(),
-            'admin_id' => null,
-            'message' => $request->message,
-            'sender' => 'user',
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $chat
-        ]);
-    }
-    public function myChat(){
-        $chat = Chat::where('user_id', auth()->id())
-            ->orderBy('id', 'asc')
-            ->get();
-
-        return response()->json([
-            'status'=> 'success',
-            'data' => $chat
-        ]);
-    }
 }
