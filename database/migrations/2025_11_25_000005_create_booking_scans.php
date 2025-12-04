@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('booking_scans', function (Blueprint $table){
             $table->id();
             $table->foreignId('booking_id')->constrained()->onDelete('cascade');
-            $table->foreignId('admin_id')->constrained()->onDelete('set null');
+            $table->foreignId('admin_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamp('scanned_at')->useCurrent();
             $table->timestamps();
         });
