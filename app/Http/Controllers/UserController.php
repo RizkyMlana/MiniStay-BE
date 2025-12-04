@@ -3,40 +3,163 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
 use App\Models\Room;
+use App\Models\RoomAvailable;
+use App\Models\Booking;
+use App\Models\Chat;
+use App\Models\Review;
 
 class UserController extends Controller
 {
-    public function index()
-    {
-        $rooms = Room::select('id', 'name', 'price_per_day', 'facilities')
-                ->withCount(['availabilities as available_days' => function ($q) {
-                        $q->where('status', 'available'); 
-                    }
-                ])
-                ->with('firstPhoto:id,room_id,url')
-                ->get();
+    public function indexRooms(){
+        $rooms = Room::with('photos')->get();
 
         return response()->json([
-            'message' => 'List rooms',
+            'status' => 'success',
             'data' => $rooms
         ]);
     }
 
-    public function show($id){
-        $room = Room::with([
-            'photos',
-            'availabilities' => function($q) {
-                $q->orderBy('date', 'asc');
-            }
-        ])->find($id);
+    public function showRoom(Room $room){
+        $room->load(['photos']);
 
-        if(!$room) {
-            return response()->json(['message' => 'Room Not Found'], 404);
-        }
         return response()->json([
-            'message'=>'Room detail',
-            'data'=> $room
+            'status' => 'success',
+            'date' => $room
+        ]);
+    }
+
+    public function calendarAvailability(Room $room){
+        $calendar = RoomAvailable::where('room_id' , $room->id)
+            ->orderBy('date')
+            ->get(['date','status']);
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'room' => $room->id,
+                'calendar' => $calendar
+            ]
+        ]);
+    }
+
+    public function bookRoom(Request $request, Room $room){
+        $request->validate([
+            'check_in' => 'required|date|after_or_equal:today',
+            'check_out' => 'required|date|after:check_in',
+        ]);
+
+        $unavailable = RoomAvailable::where('room_id', $room->id)
+            ->whereBetween('date', [$request->check_in, $request->check_out])
+            ->where('status', 'booked')
+            ->exists();
+        if ($unavailable){
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Room unavailable for selected date'
+            ], 422);
+        }
+        $days = (strtotime($request->check_out) - strtotime($request->check_in)) / 86400;
+        $totalPrice = $days * $room->price_per_day;
+        $booking = Booking::create([
+            'user_id' => auth()->id(),
+            'room_id' => $room->id,
+            'check_in' => $request->check_in,
+            'check_out' => $request->check_out,
+            'total_price' => $totalPrice,
+            'status' => 'waiting_payment',
+            'booking_code' => strtoupper(Str::random(8))
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $booking,
+        ]);
+    }
+
+    public function myBooking(){
+        $booking = Booking::with('room')
+            ->where('user_id', auth()->id())
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $booking
+        ]);
+
+    }
+
+    public function submitReview(Request $request, Booking $booking){
+        if($booking->user_id !== auth()->id()){
+            return response()->json([
+                'status' => 'failed',
+                 'message' => 'Unauthorized'
+            ], 403);
+        }
+        if($booking->status !== 'completed'){
+            return response()->json([
+                'status'=>'failed',
+                'data' => 'Review Only allowed when booking completed'
+            ]);
+        }
+        $request->validate([
+            'rating' => 'required|integer|between:1,5',
+            'comment' => 'nullable|string',
+        ]);
+
+        $review = Review::create([
+            'booking_id' => $booking->id,
+            'user_id' => auth()->id(),
+            'room_id' => $booking->room_id,
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $review
+        ]);
+    }
+
+    public function myReviews(){
+        $review = Review::with('room')
+            ->where('user_id', auth()->id())
+            ->get();
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => $review
+        ]);
+    }
+
+    public function sendChat(Request $request){
+        $request->validate([
+            'message' => 'required|string'
+        ]);
+
+        $chat = Chat::create([
+            'user_id' => auth()->id(),
+            'admin_id' => null,
+            'message' => $request->message,
+            'sender' => 'user',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $chat
+        ]);
+    }
+    public function myChat(){
+        $chat = Chat::where('user_id', auth()->id())
+            ->orderBy('id', 'asc')
+            ->get();
+
+        return response()->json([
+            'status'=> 'success',
+            'data' => $chat
         ]);
     }
 }
