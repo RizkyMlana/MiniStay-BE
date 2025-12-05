@@ -15,7 +15,7 @@ class BookingScanController extends Controller
 
         BookingScan::create([
             'booking_id' => $booking->id,
-            'admin_id' => auth()->id()
+            'admin_id' => auth()->guard('admin')->id(),
         ]);
 
         $booking->status = 'checked_in';

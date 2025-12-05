@@ -37,7 +37,7 @@ class PaymentController extends Controller
 
     public function myPayments(){
         $data = Payment::whereHas('booking', fn($q) => 
-            $q->where('user_id', auth()->id())
+            $q->where('user_id', auth()->guard('user')->id())
         )->get();
 
         return response()->json($data);

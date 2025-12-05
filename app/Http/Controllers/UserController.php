@@ -8,7 +8,6 @@ use Illuminate\Support\Str;
 use App\Models\Room;
 use App\Models\RoomAvailable;
 use App\Models\Booking;
-use App\Models\Chat;
 use App\Models\Review;
 
 class UserController extends Controller
@@ -64,7 +63,7 @@ class UserController extends Controller
         $days = (strtotime($request->check_out) - strtotime($request->check_in)) / 86400;
         $totalPrice = $days * $room->price_per_day;
         $booking = Booking::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth()->guard()->id(),
             'room_id' => $room->id,
             'check_in' => $request->check_in,
             'check_out' => $request->check_out,
@@ -81,7 +80,7 @@ class UserController extends Controller
 
     public function myBooking(){
         $booking = Booking::with('room')
-            ->where('user_id', auth()->id())
+            ->where('user_id', auth()->guard('user')->id())
             ->orderBy('id', 'desc')
             ->get();
 
@@ -93,7 +92,7 @@ class UserController extends Controller
     }
 
     public function submitReview(Request $request, Booking $booking){
-        if($booking->user_id !== auth()->id()){
+        if($booking->user_id !== auth()->guard('user')->id()){
             return response()->json([
                 'status' => 'failed',
                  'message' => 'Unauthorized'
@@ -112,7 +111,7 @@ class UserController extends Controller
 
         $review = Review::create([
             'booking_id' => $booking->id,
-            'user_id' => auth()->id(),
+            'user_id' => auth()->guard('user')->id(),
             'room_id' => $booking->room_id,
             'rating' => $request->rating,
             'comment' => $request->comment,
@@ -126,7 +125,7 @@ class UserController extends Controller
 
     public function myReviews(){
         $review = Review::with('room')
-            ->where('user_id', auth()->id())
+            ->where('user_id', auth()->guard('user')->id())
             ->get();
         
         return response()->json([
