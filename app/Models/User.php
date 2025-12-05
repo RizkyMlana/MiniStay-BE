@@ -8,8 +8,22 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @OA\Schema(
+ *   schema="User",
+ *   type="object",
+ *   required={"phone"},
+ *   @OA\Property(property="id", type="integer"),
+ *   @OA\Property(property="name", type="string", nullable=true),
+ *   @OA\Property(property="phone", type="string"),
+ *   @OA\Property(property="created_at", type="string", format="date-time", nullable=true),
+ *   @OA\Property(property="updated_at", type="string", format="date-time", nullable=true),
+ * )
+ */
+
 class User extends Authenticatable
 {
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
 

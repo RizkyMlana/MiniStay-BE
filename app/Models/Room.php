@@ -6,6 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * @OA\Schema(
+ *   schema="Room",
+ *   type="object",
+ *   required={"name","price_per_day"},
+ *   @OA\Property(property="id", type="integer"),
+ *   @OA\Property(property="name", type="string"),
+ *   @OA\Property(property="price_per_day", type="integer"),
+ *   @OA\Property(property="description", type="string", nullable=true),
+ *   @OA\Property(property="facilities", type="object", nullable=true),
+ *   @OA\Property(property="created_at", type="string", format="date-time", nullable=true),
+ *   @OA\Property(property="updated_at", type="string", format="date-time", nullable=true),
+ * )
+ */
+
 class Room extends Model
 {
     use HasFactory, Notifiable;

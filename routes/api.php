@@ -60,13 +60,12 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/bookings/{id}', [AdminController::class, 'showBooking']);
     Route::patch('/bookings/{id}/status', [AdminController::class, 'updateBookingStatus']);
     Route::patch('/bookings/{id}/cancel', [AdminController::class, 'cancelBooking']);
-
     // Payment
     Route::patch('/payments/{id}/confirm', [AdminController::class, 'confirmPayment']);
-
     // Rooms
     Route::post('/rooms', [RoomController::class, 'createRoom']);
     Route::put('/rooms/{id}', [RoomController::class, 'updateRoom']);
+    Route::delete('/rooms/{id}' , [RoomController::class, 'deleteRoom']);
     Route::post('/rooms/{id}/upload-photo', [RoomController::class, 'uploadPhoto']);
     Route::patch('/rooms/{id}/availability', [RoomController::class, 'updateAvailability']);
     Route::get('/rooms/{id}/calendar', [RoomController::class, 'calendarAdmin']);

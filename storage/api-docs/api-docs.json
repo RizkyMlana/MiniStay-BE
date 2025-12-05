@@ -1,0 +1,2326 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "MiniStay API",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/admin/bookings": {
+            "get": {
+                "tags": [
+                    "Admin - Booking"
+                ],
+                "summary": "Get list of all bookings",
+                "operationId": "a81423c7773607be36134c5bce5de087",
+                "responses": {
+                    "200": {
+                        "description": "List of all bookings",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Booking"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/bookings/{id}": {
+            "get": {
+                "tags": [
+                    "Admin - Booking"
+                ],
+                "summary": "Get detailed information of a booking",
+                "operationId": "397969d1efb48fb1419e0dd6c018bc15",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Booking ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Booking detail",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Booking"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/bookings/{id}/status": {
+            "put": {
+                "tags": [
+                    "Admin - Booking"
+                ],
+                "summary": "Update booking status",
+                "operationId": "b98f3e66e789077a53807773f4178277",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Booking ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "New status for the booking",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "example": "confirmed"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Status successfully updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Booking"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/bookings/{id}/cancel": {
+            "put": {
+                "tags": [
+                    "Admin - Booking"
+                ],
+                "summary": "Cancel a booking",
+                "operationId": "4968782b9a2fbe34890953eb69fdfff7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Booking ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Booking cancelled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Booking Cancelled"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/payments/{id}/confirm": {
+            "put": {
+                "tags": [
+                    "Admin - Payment"
+                ],
+                "summary": "Confirm payment for a booking",
+                "operationId": "43ee181424f80e346af4c42e675f0c76",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Payment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment has been confirmed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment Confirmed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/admin/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login sebagai admin",
+                "description": "Autentikasi admin menggunakan username dan password.",
+                "operationId": "e8cf10bc981a462897b52593bd879911",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "akurajakauhitam"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Admin login successful"
+                                        },
+                                        "role": {
+                                            "type": "string",
+                                            "example": "admin"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "name atau password salah",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "name atau password salah"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout admin atau user",
+                "description": "Menghapus sesi autentikasi untuk admin (session) atau user (API token).",
+                "operationId": "69281b12abb272c76871f19cb17ca563",
+                "responses": {
+                    "200": {
+                        "description": "Logout berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Admin logout berhasil"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Tidak ada sesi login",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tidak ada sesi login"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/scan": {
+            "post": {
+                "tags": [
+                    "Admin - Booking Scan"
+                ],
+                "summary": "Scan QR booking untuk check-in",
+                "description": "Memvalidasi booking_code dari QR dan mencatat data scan oleh admin.",
+                "operationId": "fd672fa49915ceda82c56091558a6804",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "booking_code"
+                                ],
+                                "properties": {
+                                    "booking_code": {
+                                        "type": "string",
+                                        "example": "MNST123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "QR valid, check-in success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "QR Valid,  check in success"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Booking code tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Booking not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Input tidak valid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The booking_code field is required."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/scans": {
+            "get": {
+                "tags": [
+                    "Admin - Booking Scan"
+                ],
+                "summary": "List semua data scan QR",
+                "description": "Menampilkan semua riwayat scan QR oleh admin, termasuk relasi booking dan admin.",
+                "operationId": "8c62fc2fc21130637a4074419da106d5",
+                "responses": {
+                    "200": {
+                        "description": "List of scans",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/BookingScan"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/chat/send": {
+            "post": {
+                "tags": [
+                    "User - Chat"
+                ],
+                "summary": "User mengirim pesan ke admin",
+                "description": "Mengirim pesan chat dari user ke admin.",
+                "operationId": "218bf23f8e35f2cf30b4c9128d00a1dc",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "message"
+                                ],
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Halo admin, saya mau tanya..."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pesan terkirim",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Chat"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/chat": {
+            "get": {
+                "tags": [
+                    "User - Chat"
+                ],
+                "summary": "Ambil semua chat user",
+                "description": "Menampilkan semua pesan chat user dan auto mark pesan admin sebagai 'seen'.",
+                "operationId": "2a9e349481a5051a80f4d179c47bcfed",
+                "responses": {
+                    "200": {
+                        "description": "Daftar chat user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Chat"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/chats/active-users": {
+            "get": {
+                "tags": [
+                    "User - Chat"
+                ],
+                "summary": "List user yang pernah chat",
+                "description": "Menampilkan semua user yang pernah mengirim pesan.",
+                "operationId": "03c157f5edd162ee4d0ff3a918351e1c",
+                "responses": {
+                    "200": {
+                        "description": "Daftar user aktif",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "user_id": {
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    },
+                                                    "user": {
+                                                        "$ref": "#/components/schemas/User"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/chats/{user_id}": {
+            "get": {
+                "tags": [
+                    "Admin - Chat"
+                ],
+                "summary": "Ambil semua chat dengan user tertentu",
+                "description": "Admin mengambil seluruh percakapan dengan user.",
+                "operationId": "1c5ab5ddf5e5c72e86da2df7df41e6ff",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "description": "ID user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Daftar pesan user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Chat"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/chats/{user_id}/send": {
+            "post": {
+                "tags": [
+                    "Admin - Chat"
+                ],
+                "summary": "Admin mengirim pesan ke user",
+                "description": "Mengirim pesan chat dari admin kepada user.",
+                "operationId": "650651f3e2d104eefa4abffb19105312",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "description": "ID user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "message"
+                                ],
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Halo user, ada yang bisa kami bantu?"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pesan terkirim",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Chat"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/chats/{user_id}/mark-seen": {
+            "put": {
+                "tags": [
+                    "Admin - Chat"
+                ],
+                "summary": "Mark pesan user sebagai sudah dibaca",
+                "description": "Menandai semua pesan user sebagai 'seen' oleh admin.",
+                "operationId": "ce577c8c20b13d597731b501ef08e2cc",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "description": "ID user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil ditandai",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "All user messages marked as seen."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/payments": {
+            "post": {
+                "tags": [
+                    "User - Payments"
+                ],
+                "summary": "Upload payment proof & store payment request",
+                "operationId": "c23c517e0d846011e09a29f2e31bbfc7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "booking_id",
+                                    "amount_requested"
+                                ],
+                                "properties": {
+                                    "booking_id": {
+                                        "type": "integer",
+                                        "example": 12
+                                    },
+                                    "amount_requested": {
+                                        "type": "integer",
+                                        "example": 300000
+                                    },
+                                    "amount_paid": {
+                                        "type": "integer",
+                                        "example": 300000,
+                                        "nullable": true
+                                    },
+                                    "bank_name": {
+                                        "type": "string",
+                                        "example": "BCA",
+                                        "nullable": true
+                                    },
+                                    "bank_account": {
+                                        "type": "string",
+                                        "example": "1234567890",
+                                        "nullable": true
+                                    },
+                                    "bank_owner": {
+                                        "type": "string",
+                                        "example": "Deny Saputra",
+                                        "nullable": true
+                                    },
+                                    "proof": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment stored successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Payment"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "userAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/payments/{id}/status": {
+            "put": {
+                "tags": [
+                    "Admin - Payments"
+                ],
+                "summary": "Update payment status (admin only)",
+                "operationId": "93ac73f06cef532c5ba211af24488759",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Payment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "example": "approved"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment status updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment status updated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Payment not found"
+                    }
+                },
+                "security": [
+                    {
+                        "adminAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/my-payments": {
+            "get": {
+                "tags": [
+                    "User - Payments"
+                ],
+                "summary": "Get all payments of authenticated user",
+                "operationId": "423ea86e783d7c08e19a28702da3dbd2",
+                "responses": {
+                    "200": {
+                        "description": "List of user payments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Payment"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "userAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/reports/daily": {
+            "get": {
+                "tags": [
+                    "Admin - Reports"
+                ],
+                "summary": "Get daily revenue report",
+                "operationId": "8f7c885b6a7e722eaef4a95569d582c6",
+                "responses": {
+                    "200": {
+                        "description": "Daily revenue grouped by date",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "date": {
+                                                "type": "string",
+                                                "example": "2025-01-10"
+                                            },
+                                            "total": {
+                                                "type": "integer",
+                                                "example": 1500000
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/reports/weekly": {
+            "get": {
+                "tags": [
+                    "Admin - Reports"
+                ],
+                "summary": "Get weekly revenue report",
+                "operationId": "0ea99d2f50ab88a972ba429a9a1fc3f8",
+                "responses": {
+                    "200": {
+                        "description": "Weekly revenue grouped by ISO week",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "week": {
+                                                "type": "string",
+                                                "example": "202501"
+                                            },
+                                            "total": {
+                                                "type": "integer",
+                                                "example": 4200000
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/reports/monthly": {
+            "get": {
+                "tags": [
+                    "Admin - Reports"
+                ],
+                "summary": "Get monthly revenue report",
+                "operationId": "eb1aefbef14ae3833e6b924fd0e18225",
+                "responses": {
+                    "200": {
+                        "description": "Monthly revenue grouped by year-month",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "month": {
+                                                "type": "string",
+                                                "example": "2025-01"
+                                            },
+                                            "total": {
+                                                "type": "integer",
+                                                "example": 12500000
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/reports/room/popular": {
+            "get": {
+                "tags": [
+                    "Admin - Reports"
+                ],
+                "summary": "Get most booked rooms",
+                "operationId": "cb1ed4f47659cbcdaa0d34cd0d691b6d",
+                "responses": {
+                    "200": {
+                        "description": "List of rooms ordered by most bookings",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "room_id": {
+                                                "type": "integer",
+                                                "example": 3
+                                            },
+                                            "count": {
+                                                "type": "integer",
+                                                "example": 42
+                                            },
+                                            "room": {
+                                                "$ref": "#/components/schemas/Room"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/reviews/{room_id}": {
+            "get": {
+                "tags": [
+                    "User - Reviews"
+                ],
+                "summary": "Get visible reviews for a room",
+                "description": "Return only reviews where is_visible = true",
+                "operationId": "dc746d20fa2ee4c4d80718388ec5a06d",
+                "parameters": [
+                    {
+                        "name": "room_id",
+                        "in": "path",
+                        "description": "ID of the room",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of reviews",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Review"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/reviews/{id}/moderate": {
+            "patch": {
+                "tags": [
+                    "Admin - Reviews"
+                ],
+                "summary": "Update review visibility",
+                "description": "Admin can hide or show user reviews",
+                "operationId": "41fab898634fb290e03387500d80dee0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Review ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "is_visible": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Visibility updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Review visibility updated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/rooms": {
+            "post": {
+                "tags": [
+                    "Admin - Rooms"
+                ],
+                "summary": "Create a new room",
+                "operationId": "ebee0ee5660d504a8725690b769205a4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "price_per_day"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "VIP Suite"
+                                    },
+                                    "price_per_day": {
+                                        "type": "integer",
+                                        "example": 350000
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Kamar luas dengan fasilitas lengkap"
+                                    },
+                                    "facilities": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "AC, TV, WiFi"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Room created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Room"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/rooms/{id}": {
+            "put": {
+                "tags": [
+                    "Admin - Rooms"
+                ],
+                "summary": "Update room data",
+                "operationId": "bf445be7b83b488608cda403f67cfa0e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Superior Room"
+                                    },
+                                    "price_per_day": {
+                                        "type": "integer",
+                                        "example": 250000
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Kamar nyaman untuk 2 orang"
+                                    },
+                                    "facilities": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Room updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Room"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Rooms"
+                ],
+                "summary": "Delete a room",
+                "operationId": "7788c9cbe476de80dba94397c381a034",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Room deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Room deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/rooms/{id}/upload-photo": {
+            "post": {
+                "tags": [
+                    "Admin - Rooms"
+                ],
+                "summary": "Upload room photo",
+                "operationId": "e7d2067222e9e0f14c36de9524078c21",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "photo"
+                                ],
+                                "properties": {
+                                    "photo": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "is_360": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Photo uploaded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Photo uploaded"
+                                        },
+                                        "url": {
+                                            "type": "string",
+                                            "example": "https://supabase.storage/rooms/photo123.jpg"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/rooms/{id}/availability": {
+            "post": {
+                "tags": [
+                    "Admin - Rooms"
+                ],
+                "summary": "Update room availability for a specific date",
+                "operationId": "9c47a7e82098cb0c06ab1db43761a551",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "date",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "date": {
+                                        "type": "string",
+                                        "example": "2025-01-10"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "available",
+                                            "booked"
+                                        ],
+                                        "example": "booked"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Availability updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Availability updated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/rooms/{id}/calendar": {
+            "get": {
+                "tags": [
+                    "Admin - Rooms"
+                ],
+                "summary": "Get full availability calendar for a room",
+                "operationId": "b54c781b99896dcc9fab0b13be6e8079",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Availability calendar",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RoomAvailability"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminAuth": []
+                    }
+                ]
+            }
+        },
+        "user/rooms": {
+            "get": {
+                "tags": [
+                    "User - Rooms"
+                ],
+                "summary": "Get all rooms",
+                "operationId": "edae1ee4d06a94c9a55d92ea0d9d7d9f",
+                "responses": {
+                    "200": {
+                        "description": "List of all rooms",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Room"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/rooms/{room}": {
+            "get": {
+                "tags": [
+                    "User - Rooms"
+                ],
+                "summary": "Get room detail",
+                "operationId": "701b922d8c0459c9b3e62dd31b62edc9",
+                "parameters": [
+                    {
+                        "name": "room",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Room detail",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "date": {
+                                            "$ref": "#/components/schemas/Room"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/rooms/{room}/calendar": {
+            "get": {
+                "tags": [
+                    "User - Rooms"
+                ],
+                "summary": "Get availability calendar for a room",
+                "operationId": "04d0500806b4f5fd0431bedbf6a07b82",
+                "parameters": [
+                    {
+                        "name": "room",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Room availability calendar",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "room": {
+                                                    "type": "integer"
+                                                },
+                                                "calendar": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/RoomAvailability"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/rooms/{room}/book": {
+            "post": {
+                "tags": [
+                    "User - Booking"
+                ],
+                "summary": "Create booking for a room",
+                "operationId": "0aa095c8545c703d647a9a0be0c2dbff",
+                "parameters": [
+                    {
+                        "name": "room",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "check_in",
+                                    "check_out"
+                                ],
+                                "properties": {
+                                    "check_in": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "check_out": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Booking created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Booking"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Room unavailable or validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/my-bookings": {
+            "get": {
+                "tags": [
+                    "User - Booking"
+                ],
+                "summary": "Get user's bookings",
+                "operationId": "f1639ec7fe2b4b6cc818bc001c0c128a",
+                "responses": {
+                    "200": {
+                        "description": "List of user's bookings",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Booking"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/bookings/{booking}/review": {
+            "post": {
+                "tags": [
+                    "User - Reviews"
+                ],
+                "summary": "Submit review for a completed booking",
+                "operationId": "a8c1dafde870eeb5ab8bf04069a06899",
+                "parameters": [
+                    {
+                        "name": "booking",
+                        "in": "path",
+                        "description": "Booking ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "rating"
+                                ],
+                                "properties": {
+                                    "rating": {
+                                        "type": "integer",
+                                        "maximum": 5,
+                                        "minimum": 1
+                                    },
+                                    "comment": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Review created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Review"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/my-reviews": {
+            "get": {
+                "tags": [
+                    "User - Reviews"
+                ],
+                "summary": "Get reviews created by authenticated user",
+                "operationId": "455807dd9dd12b4e8137e5082784d00b",
+                "responses": {
+                    "200": {
+                        "description": "List of user's reviews",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Review"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Admin": {
+                "required": [
+                    "name",
+                    "password"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Booking": {
+                "required": [
+                    "user_id",
+                    "room_id",
+                    "check_in",
+                    "check_out",
+                    "total_price",
+                    "booking_code"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "room_id": {
+                        "type": "integer"
+                    },
+                    "check_in": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "check_out": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "total_price": {
+                        "type": "integer"
+                    },
+                    "booking_code": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "waiting_payment",
+                            "paid",
+                            "cancelled",
+                            "checked_in",
+                            "completed"
+                        ]
+                    },
+                    "qr_code_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "BookingScan": {
+                "required": [
+                    "booking_id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "booking_id": {
+                        "type": "integer"
+                    },
+                    "admin_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "scanned_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Chat": {
+                "required": [
+                    "message",
+                    "sender"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "admin_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "sender": {
+                        "type": "string",
+                        "enum": [
+                            "user",
+                            "admin"
+                        ]
+                    },
+                    "is_seen": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "OtpCode": {
+                "required": [
+                    "phone",
+                    "code",
+                    "expires_at"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Payment": {
+                "required": [
+                    "booking_id",
+                    "amount_requested"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "booking_id": {
+                        "type": "integer"
+                    },
+                    "amount_requested": {
+                        "type": "integer"
+                    },
+                    "amount_paid": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "bank_name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "bank_account": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "bank_owner": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "proof_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "waiting_confirmation",
+                            "paid",
+                            "failed"
+                        ]
+                    },
+                    "expired_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "paid_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Review": {
+                "required": [
+                    "booking_id",
+                    "user_id",
+                    "room_id",
+                    "rating"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "booking_id": {
+                        "type": "integer"
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "room_id": {
+                        "type": "integer"
+                    },
+                    "rating": {
+                        "type": "integer"
+                    },
+                    "comment": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "is_visible": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Room": {
+                "required": [
+                    "name",
+                    "price_per_day"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "price_per_day": {
+                        "type": "integer"
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "facilities": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "RoomAvailability": {
+                "required": [
+                    "room_id",
+                    "date",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "room_id": {
+                        "type": "integer"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "available",
+                            "booked"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "RoomPhoto": {
+                "required": [
+                    "room_id",
+                    "url"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "room_id": {
+                        "type": "integer"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "is_360": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "required": [
+                    "phone"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Admin - Booking",
+            "description": "Admin - Booking"
+        },
+        {
+            "name": "Admin - Payment",
+            "description": "Admin - Payment"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Admin - Booking Scan",
+            "description": "Admin - Booking Scan"
+        },
+        {
+            "name": "User - Chat",
+            "description": "User - Chat"
+        },
+        {
+            "name": "Admin - Chat",
+            "description": "Admin - Chat"
+        },
+        {
+            "name": "User - Payments",
+            "description": "User - Payments"
+        },
+        {
+            "name": "Admin - Payments",
+            "description": "Admin - Payments"
+        },
+        {
+            "name": "Admin - Reports",
+            "description": "Admin - Reports"
+        },
+        {
+            "name": "User - Reviews",
+            "description": "User - Reviews"
+        },
+        {
+            "name": "Admin - Reviews",
+            "description": "Admin - Reviews"
+        },
+        {
+            "name": "Admin - Rooms",
+            "description": "Admin - Rooms"
+        },
+        {
+            "name": "User - Rooms",
+            "description": "User - Rooms"
+        },
+        {
+            "name": "User - Booking",
+            "description": "User - Booking"
+        }
+    ]
+}
