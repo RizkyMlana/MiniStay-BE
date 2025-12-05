@@ -25,8 +25,6 @@ Route::prefix('auth')->group(function () {
 });
 
 
-Route::get('/rooms', [UserController::class, 'indexRooms']);
-
 Route::prefix('user')->middleware('auth:user')->group(function () {
 
     // Rooms
