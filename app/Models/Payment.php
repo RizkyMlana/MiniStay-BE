@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    protected $fillable = ['booking_id', 'payment_method', 'xendit_invoice_id', 'xendit_status', 'invoice_url', 'amount', 'raw_response'];
+    protected $fillable = ['booking_id', 'amount_requested', 'amount_paid', 'bank_name', 'bank_account', 'bank_owner', 'proof_url', 'status', 'expired_at'. 'paid_at'];
 
-    protected $casts = ['raw_response'=> 'array', 'amount'=>'decimal:2'];
+    protected $casts = [];
 
     public function booking(){
         return $this->belongsTo(Booking::class);
