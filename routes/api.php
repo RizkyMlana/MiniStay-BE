@@ -19,8 +19,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/send-otp', [AuthController::class, 'generateOtp']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('/login', [AuthController::class, 'loginAdmin']);
-    Route::post('/logout', [AuthController::class, 'logout'])
-        ->middleware('auth:user,admin');
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:user,admin');
 });
 
 
