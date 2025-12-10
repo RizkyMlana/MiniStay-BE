@@ -47,15 +47,7 @@ class User extends Authenticatable
         return $this->hasMany(Review::class);
     }
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    
 
     /**
      * Get the attributes that should be cast.
