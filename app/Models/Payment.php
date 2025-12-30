@@ -4,14 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-
 class Payment extends Model
 {
-    protected $fillable = ['booking_id', 'amount_requested', 'amount_paid', 'bank_name', 'bank_account', 'bank_owner', 'proof_url', 'status', 'expired_at'. 'paid_at'];
+    protected $fillable = [
+        'booking_id',
+        'amount',
+        'method',
+        'status',
+        'confirmed_by',
+        'confirmed_at',
+    ];
 
-    protected $casts = [];
+    protected $casts = [
+        'confirmed_at' => 'datetime',
+    ];
 
-    public function booking(){
+    public function booking()
+    {
         return $this->belongsTo(Booking::class);
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'confirmed_by');
+    }
+
+    public function isConfirmed(): bool
+    {
+        return $this->status === 'confirmed';
     }
 }

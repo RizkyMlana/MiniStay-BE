@@ -2,34 +2,37 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
-
 
 class Room extends Model
 {
-    use HasFactory, Notifiable;
-
     protected $fillable = [
-        'name', 'price_per_day','description','facilities'
+        'name',
+        'description',
+        'price_per_day',
+        'capacity,'
     ];
 
-    protected $casts = ['facilities' => 'array'];
-    public function photos(){
-        return $this->hasMany(RoomPhoto::class);
+    public function images(){
+        return $this->hasMany(RoomImage::class);
     }
-    public function firstPhoto(){
-        return $this->hasOne(RoomPhoto::class)->orderBy('id', 'asc');
-    }
-    public function availabilities(){
-        return $this->hasMany(RoomAvailable::class);
-    }
-    public function bookings() {
+    public function bookings(){
         return $this->hasMany(Booking::class);
     }
-    public function reviews() {
-        return $this->hasMany(Review::class);
+
+    public function blocks(){
+        return $this->hasMany(RoomBlock::class);
     }
-    
+
+    public function isActive():bool{
+        return in_array($this->status, [
+            'pending_payment',
+            'waiting_confirmation',
+            'paid',
+        ]);
+    }
+
+    public function isPaid():bool{
+        return $this->status === 'paid';
+    }
 }

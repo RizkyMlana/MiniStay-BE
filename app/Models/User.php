@@ -21,20 +21,34 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $table = 'users';
     protected $fillable = [
         'name',
         'phone',
+        'password',
+        'role',
     ];
-    public function bookings() {
+
+    protected $hidden = [
+        'password',
+    ];
+    protected $casts = [
+        'phone_verified_at' => 'datetime',
+    ];
+
+    public function isAdmin(): bool{
+        return $this->role === 'admin';
+    }
+
+    public function bookings(){
         return $this->hasMany(Booking::class);
     }
-    public function chats() {
-        return $this->hasMany(Chat::class);
+    public function messages(){
+        return $this->hasMany(Message::class, 'sender_id');
     }
-    public function reviews() {
-        return $this->hasMany(Review::class);
+    public function confirmedPayments(){
+        return $this->hasMany(Payment::class, 'confirmed_by');
     }
+
 
     
 

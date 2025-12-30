@@ -13,28 +13,13 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
-            $table->string('phone')->unique();
-            $table->timestamps();
-        });
-
-
-        Schema::create('admins', function (Blueprint $table){
-            $table->id();
             $table->string('name');
-            $table->string('password');
+            $table->string('phone')->unique()->nullable()->unique();
+            $table->string('password')->nullable();
+            $table->enum('role', ['admin', 'user']);
             $table->timestamps();
         });
 
-        Schema::create('otp_codes', function (Blueprint $table) {
-            $table->id();
-            $table->string('phone')->index();
-            $table->string('code');
-            $table->timestamp('expires_at');
-            $table->timestamps();
-
-            $table->index(['phone', 'code']);
-        });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
@@ -60,7 +45,6 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
-        Schema::dropIfExists('admins');
         Schema::dropIfExists('otp_codes');
     }
 };
