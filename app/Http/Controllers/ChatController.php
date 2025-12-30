@@ -7,32 +7,6 @@ use Illuminate\Http\Request;
 
 class ChatController extends Controller
 {
-
-/**
- * @OA\Post(
- *     path="/api/user/chat/send",
- *     tags={"User - Chat"},
- *     summary="User mengirim pesan ke admin",
- *     description="Mengirim pesan chat dari user ke admin.",
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"message"},
- *             @OA\Property(property="message", type="string", example="Halo admin, saya mau tanya...")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Pesan terkirim",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="status", type="string", example="success"),
- *             @OA\Property(property="data", ref="#/components/schemas/Chat")
- *         )
- *     )
- * )
- */
-
     public function sendMessageAsUser(Request $request)
     {
         $request->validate([
@@ -55,28 +29,6 @@ class ChatController extends Controller
 
 
 
-/**
- * @OA\Get(
- *     path="/api/user/chat",
- *     tags={"User - Chat"},
- *     summary="Ambil semua chat user",
- *     description="Menampilkan semua pesan chat user dan auto mark pesan admin sebagai 'seen'.",
- *     @OA\Response(
- *         response=200,
- *         description="Daftar chat user",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="status", type="string", example="success"),
- *             @OA\Property(
- *                 property="data",
- *                 type="array",
- *                 @OA\Items(ref="#/components/schemas/Chat")
- *             )
- *         )
- *     )
- * )
- */
-
     public function myChats()
     {
         $chats = Chat::where('user_id', auth('user')->id())
@@ -95,32 +47,6 @@ class ChatController extends Controller
         ]);
     }
 
-/**
- * @OA\Get(
- *     path="/api/admin/chats/active-users",
- *     tags={"User - Chat"},
- *     summary="List user yang pernah chat",
- *     description="Menampilkan semua user yang pernah mengirim pesan.",
- *     @OA\Response(
- *         response=200,
- *         description="Daftar user aktif",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="status", type="string", example="success"),
- *             @OA\Property(
- *                 property="data",
- *                 type="array",
- *                 @OA\Items(
- *                     type="object",
- *                     @OA\Property(property="user_id", type="integer", example=3),
- *                     @OA\Property(property="user", ref="#/components/schemas/User")
- *                 )
- *             )
- *         )
- *     )
- * )
- */
-
 
     public function listActiveChats()
     {
@@ -136,34 +62,6 @@ class ChatController extends Controller
             'data' => $users
         ]);
     }
-/**
- * @OA\Get(
- *     path="/api/admin/chats/{user_id}",
- *     tags={"Admin - Chat"},
- *     summary="Ambil semua chat dengan user tertentu",
- *     description="Admin mengambil seluruh percakapan dengan user.",
- *     @OA\Parameter(
- *         name="user_id",
- *         in="path",
- *         required=true,
- *         description="ID user",
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Daftar pesan user",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="status", type="string", example="success"),
- *             @OA\Property(
- *                 property="data",
- *                 type="array",
- *                 @OA\Items(ref="#/components/schemas/Chat")
- *             )
- *         )
- *     )
- * )
- */
 
 
     public function getMessagesWithUser($user_id)
@@ -184,37 +82,6 @@ class ChatController extends Controller
         ]);
     }
 
-/**
- * @OA\Post(
- *     path="/api/admin/chats/{user_id}/send",
- *     tags={"Admin - Chat"},
- *     summary="Admin mengirim pesan ke user",
- *     description="Mengirim pesan chat dari admin kepada user.",
- *     @OA\Parameter(
- *         name="user_id",
- *         in="path",
- *         required=true,
- *         description="ID user",
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"message"},
- *             @OA\Property(property="message", type="string", example="Halo user, ada yang bisa kami bantu?")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Pesan terkirim",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="status", type="string", example="success"),
- *             @OA\Property(property="data", ref="#/components/schemas/Chat")
- *         )
- *     )
- * )
- */
 
 
     public function sendMessageAsAdmin(Request $request, $user_id)
@@ -237,30 +104,6 @@ class ChatController extends Controller
         ]);
     }
 
-/**
- * @OA\Put(
- *     path="/api/admin/chats/{user_id}/mark-seen",
- *     tags={"Admin - Chat"},
- *     summary="Mark pesan user sebagai sudah dibaca",
- *     description="Menandai semua pesan user sebagai 'seen' oleh admin.",
- *     @OA\Parameter(
- *         name="user_id",
- *         in="path",
- *         required=true,
- *         description="ID user",
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Berhasil ditandai",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="status", type="string", example="success"),
- *             @OA\Property(property="message", type="string", example="All user messages marked as seen.")
- *         )
- *     )
- * )
- */
 
 
     public function markMessagesAsSeen($user_id)

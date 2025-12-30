@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedInteger('price_per_day');
+            $table->unsignedInteger('price_per_day', 10, 2);
             $table->text('description')->nullable();
-            $table->json('facilities')->nullable();
             $table->timestamps();
         });
         

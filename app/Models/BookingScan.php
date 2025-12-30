@@ -4,19 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @OA\Schema(
- *   schema="BookingScan",
- *   type="object",
- *   required={"booking_id"},
- *   @OA\Property(property="id", type="integer"),
- *   @OA\Property(property="booking_id", type="integer"),
- *   @OA\Property(property="admin_id", type="integer", nullable=true),
- *   @OA\Property(property="scanned_at", type="string", format="date-time"),
- *   @OA\Property(property="created_at", type="string", format="date-time", nullable=true),
- *   @OA\Property(property="updated_at", type="string", format="date-time", nullable=true),
- * )
- */
 
 class BookingScan extends Model
 {

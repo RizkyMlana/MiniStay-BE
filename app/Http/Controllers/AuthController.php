@@ -8,40 +8,6 @@ use App\Models\OtpCode;
 class AuthController extends Controller
 {
 
-/**
- * @OA\Post(
- *     path="/api/auth/admin/login",
- *     tags={"Auth"},
- *     summary="Login sebagai admin",
- *     description="Autentikasi admin menggunakan username dan password.",
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"name","password"},
- *             @OA\Property(property="name", type="string", example="akurajakauhitam"),
- *             @OA\Property(property="password", type="string", example="password123")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Login berhasil",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="message", type="string", example="Admin login successful"),
- *             @OA\Property(property="role", type="string", example="admin")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="name atau password salah",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="message", type="string", example="name atau password salah")
- *         )
- *     )
- * )
- */
-
     public function loginAdmin(Request $request)
     {
         $request->validate([
@@ -124,30 +90,6 @@ class AuthController extends Controller
         ]);
     }
 
-/**
- * @OA\Post(
- *     path="/api/auth/logout",
- *     tags={"Auth"},
- *     summary="Logout admin atau user",
- *     description="Menghapus sesi autentikasi untuk admin (session) atau user (API token).",
- *     @OA\Response(
- *         response=200,
- *         description="Logout berhasil",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="message", type="string", example="Admin logout berhasil")
- *         )
- *     ),
- *     @OA\Response(
- *         response=400,
- *         description="Tidak ada sesi login",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="message", type="string", example="Tidak ada sesi login")
- *         )
- *     )
- * )
- */
 
     public function logout(Request $request)
     {
