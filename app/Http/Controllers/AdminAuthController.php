@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminAuthController extends Controller
 {
+    // Login Function
     public function login(Request $request)
     {
         $request->validate([
@@ -40,7 +41,7 @@ class AdminAuthController extends Controller
             ]
         ]);
     }
-
+    // Logout Function
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
