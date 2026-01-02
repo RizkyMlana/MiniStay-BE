@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CheckinController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\UserAuthController;
 use Illuminate\Http\Request;
@@ -12,4 +13,8 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [UserAuthController::class, 'logout']);
     });
+});
+
+Route::middleware(['auth:admin'])->group(function () {
+    Route::post('/admin/checkin', [CheckinController::class, 'checkin']);
 });
