@@ -6,7 +6,6 @@ use App\Helpers\WhatsApp;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\RoomBlock;
-use App\Services\BookingService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
