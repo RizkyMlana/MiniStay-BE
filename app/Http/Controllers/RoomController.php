@@ -2,38 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
 use App\Models\Room;
+use App\Models\RoomBlock;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
 {
-    public function index(){
-        return Room::select(
-            'id',
-            'name',
-            'price_per_day',
-            'thumbnail',
-        )
-        ->where('is_active', true)->get();
+    private function isRoomAvailableToday(int $roomId): bool{
+        return !RoomBlock::where('room_id', $roomId)
+            ->where('start_date', '<=', today())
+            ->where('end_date', '>=', today())
+            ->exists();
     }
+    public function index() {
+        $room = Room::with(['images'])
+            ->get()
+            ->map(function ($room) {
+                $room->is_available = $this->isRoomAvailableToday($room->id);
+                return $room;
+            });
+        return response()->json($room);
+    }
+
     public function show($id){
-        return Room::with('images')->findOrFail($id);
-    }
+        $room = Room::with(['images'])->findOrFail($id);
 
-    public function availability(Request $request, $id){
-        $request->validate([
-            'check_in_date' => 'required|date',
-            'check_out_date' => 'required|date|after:date:check_in_date',
-        ]);
-
-        $conflict = Booking::where('room_id', $id)
-        ->whereIn('status', ['pending','paid'])
-        ->where(function ($q) use ($request) {
-            $q->where('check_in_date', '<', $request->check_out_date)
-            ->where('check_out_date', '>', $request->check_in_date);
-        })
-        ->exists();
-        return ['available' => !$conflict];
+        return response()->json($room);
     }
 }
