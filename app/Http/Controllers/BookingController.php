@@ -9,66 +9,131 @@ use App\Models\RoomBlock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class BookingController extends Controller
 {
     public function store(Request $request){
-        $data = $request->validate([
+        $request->validate([
             'room_id' => 'required|exists:rooms,id',
             'check_in_date' => 'required|date',
-            'check_out_date' => 'required|date',
+            'check_out_date' => 'required|date|after:check_in_date',
         ]);
 
-        $checkIn = Carbon::parse($data['check_in_date'])->startOfDay();
-        $checkOut = Carbon::parse($data['check_out_date'])->startOfDay();
+        $user = $request->user();
 
-        if($checkOut <= $checkIn) {
-            abort(422, 'Invalid date range');
-        }
+        $checkIn  = Carbon::parse($request->check_in_date)->startOfDay();
+        $checkOut = Carbon::parse($request->check_out_date)->startOfDay();
 
-        $conflict = Booking::where('room_id', $data['room_id'])
-            ->whereIn('status', ['pending', 'paid'])
+        $conflictBooking = Booking::where('room_id', $request->room_id)
+            ->whereIn('status', [
+                'pending_payment',
+                'waiting_confirmation',
+                'paid'
+            ])
             ->where(function ($q) use ($checkIn, $checkOut) {
                 $q->where('check_in_date', '<', $checkOut)
-                ->where('check_out_date', '>', $checkIn);
+                  ->where('check_out_date', '>', $checkIn);
             })
             ->exists();
 
-        if($conflict){
-            abort(409, 'Room not available');
+        if ($conflictBooking) {
+            return response()->json([
+                'message' => 'Room not available'
+            ], 422);
         }
 
-        $room = Room::findOrFail($data['room_id']);
+        $conflictBlock = RoomBlock::where('room_id', $request->room_id)
+            ->where('start_date', '<', $checkOut)
+            ->where('end_date', '>', $checkIn)
+            ->exists();
+
+        if ($conflictBlock) {
+            return response()->json([
+                'message' => 'Room is blocked'
+            ], 422);
+        }
+
+        $room = Room::findOrFail($request->room_id);
         $days = $checkIn->diffInDays($checkOut);
+
+        if ($days < 1) {
+            return response()->json([
+                'message' => 'Minimum 1 night'
+            ], 422);
+        }
+
         $totalPrice = $days * $room->price_per_day;
 
-        $booking = DB::transaction(function () use ($room, $checkIn, $checkOut, $totalPrice) {
+        $booking = DB::transaction(function () use (
+            $user,
+            $room,
+            $checkIn,
+            $checkOut,
+            $totalPrice
+        ) {
             $booking = Booking::create([
-                'booking_code' => 'MS-' . strtoupper(uniqid()),
-                'user_id' => auth()->id(),
-                'room_id' => $room->id,
-                'check_in_date' => $checkIn,
-                'check_out_date' => $checkOut,
-                'status' => 'pending',
-                'total_price' => $totalPrice,
+                'booking_code'     => 'MS-' . strtoupper(Str::random(8)),
+                'user_id'          => $user->id,
+                'room_id'          => $room->id,
+                'check_in_date'    => $checkIn,
+                'check_out_date'   => $checkOut,
+                'status'           => 'pending_payment',
+                'total_price'      => $totalPrice,
+                'payment_deadline' => now()->addHours(6),
             ]);
 
             RoomBlock::create([
-                'room_id' => $room->id,
-                'booking_id' => $booking->id,
+                'room_id'    => $room->id,
                 'start_date' => $checkIn,
-                'end_date' => $checkOut,
-                'type' => 'booking',
+                'end_date'   => $checkOut,
+                'reason'     => 'booking',
             ]);
 
             return $booking;
         });
 
-        WhatsApp::send(
-            auth()->user()->phone,
-            "Booking {$booking->booking_code} berhasil dibuat. \nTotal: Rp{$booking->total_price}"
-        );
-        return response()->json($booking);
+        return response()->json($booking, 201);
+    }
 
+
+
+    public function myBookings(Request $request){
+        return Booking::where('user_id', $request->user()->id)
+            ->with('room')
+            ->orderByDesc('created_at')
+            ->get();
+    }
+
+
+    public function index(){
+        return Booking::with(['user', 'room'])
+            ->orderByDesc('created_at')
+            ->get();
+    }
+
+    public function cancel($id){
+        $booking = Booking::findOrFail($id);
+
+        if(in_array($booking->status, ['paid', 'completed'])) {
+            return response()->json([
+                'message' => 'Cannot cancel'
+            ], 422);
+        }
+
+        DB::transaction(function () use ($booking) {
+            $booking->update([
+                'status' => 'cancelled',
+            ]);
+
+            RoomBlock::where('room_id', $booking->room_id)
+                ->where('start_date', $booking->check_in_date)
+                ->where('end_date', $booking->check_out_date)
+                ->delete();
+        });
+
+        return response()->json([
+            'message' => 'Booking cancelled'
+        ]);
     }
 }

@@ -8,23 +8,32 @@ use Illuminate\Http\Request;
 
 class CheckinController extends Controller
 {
-    public function checkIn(string $token){
-        $booking = Booking::where('qr_token', $token)->firstOrFail();
+    public function checkin(Request $request){
+        $request->validate([
+            'booking_code' => 'required|string',
+        ]);
+
+        $booking = Booking::where('booking_code', $request->booking_code)
+            ->firstOrFail();
 
         if($booking->status !== 'paid') {
-            abort(400, 'Booking not paid');
+            return response()->json([
+                'message' => 'Booking not paid or already used'
+            ], 422);
         }
-        if($booking->checked_in_at) {
-            abort(400, 'Already checked in');
-        }
-        if(Carbon::today()->lt($booking->check_in_date)) {
-            abort(400, 'Check in date not reached');
+
+        if(Carbon::today()->lt(Carbon::parse($booking->check_in_date))) {
+            return response()->json([
+                'message' => 'Check-in date not reached'
+            ], 422);
         }
 
         $booking->update([
-            'checked_in_at' => Carbon::now(),
+            'status' => 'completed',
         ]);
 
-        return response()->json(['message' => 'Checked in']);
+        return response()->json([
+            'message' => 'Check-in success, booking completed'
+        ]);
     }
 }
