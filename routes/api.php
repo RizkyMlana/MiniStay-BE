@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\AdminRatingController;
 use App\Http\Controllers\AdminRoomController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\RatingController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoomAvailabilityController;
 use App\Http\Controllers\RoomBlockController;
 use App\Http\Controllers\RoomController;
@@ -46,10 +50,30 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/admin/payments/{id}/reject', [PaymentController::class, 'reject']);
 
     Route::post('/admin/checkin', [CheckinController::class, 'checkin']);
+    
+    Route::get('/admin/ratings', [AdminRatingController::class, 'index']);
+    Route::post('/admin/rating/{id}/toggle', [AdminRatingController::class, 'toggleVisibility']);
+
+    Route::prefix('admin/reports')->group(function () {
+        Route::get('/daily', [ReportController::class, 'daily']);
+        Route::get('/weekly', [ReportController::class, 'weekly']);
+        Route::get('/monthly', [ReportController::class, 'monthly']);
+        Route::get('/top-rooms', [ReportController::class, 'topRooms']);
+    });
+
+    Route::get('/messages', [ChatController::class, 'index']);
+    Route::post('/messages', [ChatController::class, 'store']);
+    Route::post('/messages/{id}/read', [ChatController::class, 'markAsRead']);
+
 
     Route::post('/bookings', [BookingController::class, 'store']);
     Route::get('/mybooking', [BookingController::class, 'myBookings']);
 
     Route::post('/bookings/{id}/pay', [PaymentController::class, 'submit']);
+
+    Route::post('/ratings', [RatingController::class, 'store']);
+    Route::get('/rooms/{roomId}/ratings', [RatingController::class, 'roomRatings']);
+
+    
 
 });
