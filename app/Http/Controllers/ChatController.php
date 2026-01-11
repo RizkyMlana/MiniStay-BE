@@ -16,10 +16,8 @@ class ChatController extends Controller
         $user = $request->user();
 
         $booking = Booking::where('id', $request->booking_id)
-            ->where(function ($q) use ($user) {
-                if ($user->role === 'user') {
-                    $q->where('user_id', $user->id);
-                }
+            ->when($user->role === 'user', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
             })
             ->firstOrFail();
 
@@ -29,6 +27,7 @@ class ChatController extends Controller
 
         return response()->json($messages);
     }
+
 
     public function store(Request $request){
         $request->validate([
@@ -45,18 +44,27 @@ class ChatController extends Controller
             ->firstOrFail();
 
         $message = Message::create([
-            'booking_id' => $booking->id,
             'sender_type' => $user->role,
             'sender_id' => $user->id,
+            'room_id' => $booking->room_id, // aman: dari booking
+            'booking_id' => $booking->id,
             'content' => $request->content,
         ]);
 
         return response()->json($message, 201);
     }
 
-    public function markAsRead($id)
-    {
-        $message = Message::findOrFail($id);
+
+    public function markAsRead($id, Request $request){
+        $user = $request->user();
+
+        $message = Message::where('id', $id)
+            ->whereHas('booking', function ($q) use ($user) {
+                if ($user->role === 'user') {
+                    $q->where('user_id', $user->id);
+                }
+            })
+            ->firstOrFail();
 
         $message->update([
             'read_at' => now(),
@@ -64,4 +72,5 @@ class ChatController extends Controller
 
         return response()->json(['message' => 'Message marked as read']);
     }
+
 }
