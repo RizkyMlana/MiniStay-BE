@@ -24,54 +24,68 @@ Route::prefix('auth')->group(function () {
     Route::post('/admin/login', [AuthController::class, 'adminLogin']);
 });
 
+
 Route::get('/rooms', [RoomController::class, 'index']);
-Route::get('/rooms/{id}', [RoomController::class, 'Show']);
-
+Route::get('/rooms/{id}', [RoomController::class, 'show']);
 Route::get('/rooms/{id}/availability', [RoomAvailabilityController::class, 'show']);
+Route::get('/rooms/{roomId}/ratings', [RatingController::class, 'roomRatings']);
 
+Route::middleware('auth:sanctum')->group(function () {
 
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('/admin/rooms', [AdminRoomController::class, 'store']);
-    Route::put('/admin/rooms/{id}', [AdminRoomController::class, 'update']);
-    Route::delete('/admin/rooms/{id}', [AdminRoomController::class, 'destroy']);
+    // CHAT (booking-scoped user & admin)
+    Route::get('/messages', [ChatController::class, 'index']);
+    Route::post('/messages', [ChatController::class, 'store']);
+    Route::post('/messages/{id}/read', [ChatController::class, 'markAsRead']);
 
-    Route::post('/admin/rooms/{roomId}/images', [RoomImageController::class, 'store']);
-    Route::post('/admin/room-images/{id}/cover', [RoomImageController::class, 'setCover']);
-    Route::delete('/admin/room-images/{id}', [RoomImageController::class, 'destroy']);
+    // BOOKINGS (USER)
+    Route::post('/bookings', [BookingController::class, 'store']);
+    Route::get('/bookings/me', [BookingController::class, 'myBookings']);
+    Route::post('/bookings/{id}/pay', [PaymentController::class, 'submit']);
 
-    Route::post('/admin/room-blocks', [RoomBlockController::class, 'store']);
+    // RATINGS
+    Route::post('/ratings', [RatingController::class, 'store']);
 
+});
 
-    Route::get('/admin/bookings', [BookingController::class, 'index']);
-    Route::post('/admin/bookings/{id}/cancel', [BookingController::class, 'cancel']);
+Route::middleware(['auth:sanctum', 'role:admin'])
+    ->prefix('admin')
+    ->group(function () {
 
-    Route::get('/admin/payments', [PaymentController::class, 'index']);
-    Route::post('/admin/payments/{id}/confirm', [PaymentController::class, 'confirm']);
-    Route::post('/admin/payments/{id}/reject', [PaymentController::class, 'reject']);
+    // ROOMS
+    Route::post('/rooms', [AdminRoomController::class, 'store']);
+    Route::put('/rooms/{id}', [AdminRoomController::class, 'update']);
+    Route::delete('/rooms/{id}', [AdminRoomController::class, 'destroy']);
 
-    Route::post('/admin/checkin', [CheckinController::class, 'checkin']);
-    
-    Route::get('/admin/ratings', [AdminRatingController::class, 'index']);
-    Route::post('/admin/rating/{id}/toggle', [AdminRatingController::class, 'toggleVisibility']);
+    // ROOM IMAGES
+    Route::post('/rooms/{roomId}/images', [RoomImageController::class, 'store']);
+    Route::post('/room-images/{id}/cover', [RoomImageController::class, 'setCover']);
+    Route::delete('/room-images/{id}', [RoomImageController::class, 'destroy']);
 
-    Route::prefix('admin/reports')->group(function () {
+    // ROOM BLOCKS
+    Route::post('/room-blocks', [RoomBlockController::class, 'store']);
+
+    // BOOKINGS (ADMIN)
+    Route::get('/bookings', [BookingController::class, 'index']);
+    Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
+
+    // PAYMENTS
+    Route::get('/payments', [PaymentController::class, 'index']);
+    Route::post('/payments/{id}/confirm', [PaymentController::class, 'confirm']);
+    Route::post('/payments/{id}/reject', [PaymentController::class, 'reject']);
+
+    // CHECK-IN
+    Route::post('/checkin', [CheckinController::class, 'checkin']);
+
+    // RATINGS MODERATION
+    Route::get('/ratings', [AdminRatingController::class, 'index']);
+    Route::post('/ratings/{id}/toggle', [AdminRatingController::class, 'toggleVisibility']);
+
+    // REPORTS
+    Route::prefix('reports')->group(function () {
         Route::get('/daily', [ReportController::class, 'daily']);
         Route::get('/weekly', [ReportController::class, 'weekly']);
         Route::get('/monthly', [ReportController::class, 'monthly']);
         Route::get('/top-rooms', [ReportController::class, 'topRooms']);
     });
-
-    Route::get('/messages', [ChatController::class, 'index']);
-    Route::post('/messages', [ChatController::class, 'store']);
-    Route::post('/messages/{id}/read', [ChatController::class, 'markAsRead']);
-
-
-    Route::post('/bookings', [BookingController::class, 'store']);
-    Route::get('/mybooking', [BookingController::class, 'myBookings']);
-
-    Route::post('/bookings/{id}/pay', [PaymentController::class, 'submit']);
-
-    Route::post('/ratings', [RatingController::class, 'store']);
-    Route::get('/rooms/{roomId}/ratings', [RatingController::class, 'roomRatings']);
 
 });
