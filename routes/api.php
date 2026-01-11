@@ -74,6 +74,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/ratings', [RatingController::class, 'store']);
     Route::get('/rooms/{roomId}/ratings', [RatingController::class, 'roomRatings']);
 
-    
-
 });
