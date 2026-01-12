@@ -84,7 +84,10 @@ class AuthController extends Controller
 
         return response()->json([
             'token' => $token,
-            'admin' => $admin,
+            'admin' => [
+                'id' => $admin->id,
+                'name' => $admin->name,
+            ],
         ]);
     }
     public function logout(Request $request){
