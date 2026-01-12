@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class Verifycsrftoken extends Middleware
+class VerifyCsrfToken extends Middleware
 {
     protected $except = [
         'api/auth/admin/login',
