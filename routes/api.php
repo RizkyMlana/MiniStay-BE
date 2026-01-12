@@ -13,6 +13,7 @@ use App\Http\Controllers\RoomAvailabilityController;
 use App\Http\Controllers\RoomBlockController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomImageController;
+use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,7 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 });
 
-Route::middleware(['auth:sanctum', 'role:admin'])
+Route::middleware(['auth:sanctum', RoleMiddleware::class. ':admin'])
     ->prefix('admin')
     ->group(function () {
 
