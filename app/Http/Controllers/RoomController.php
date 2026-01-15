@@ -25,28 +25,89 @@ class RoomController extends Controller
             ? $activeBlock->end_date->addDay()->toDateString()
             : today()->toDateString();
     }
-    public function index() {
-        $room = Room::with(['images'])->get();
+    public function index()
+    {
+        $rooms = Room::query()
+            ->leftJoin('bookings', 'bookings.room_id', '=', 'rooms.id')
+            ->leftJoin('ratings', function ($join) {
+                $join->on('ratings.booking_id', '=', 'bookings.id')
+                    ->where('ratings.is_visible', true);
+            })
+            ->select(
+                'rooms.id',
+                'rooms.name',
+                'rooms.price_per_day',
+                'rooms.type',
+                'rooms.location'
+            )
+            ->selectRaw('AVG(ratings.rating) as avg_rating')
+            ->groupBy(
+                'rooms.id',
+                'rooms.name',
+                'rooms.price_per_day',
+                'rooms.facilities',
+                'rooms.type',
+                'rooms.location'
+            )
+            ->with(['images' => function ($q) {
+                $q->where('is_cover', true);
+            }])
+            ->get();
 
-        $room->transform(function ($room) {
-            $room->is_available = $this->isRoomAvailableToday($room->id);
-            $room->next_available_date = $this->getNextAvailableDate($room->id);
-            return $room;
+        $rooms->transform(function ($room) {
+            return [
+                'id' => $room->id,
+                'name' => $room->name,
+                'price_per_day' => $room->price_per_day,
+                'type' => $room->type,
+                'location' => $room->location,
+
+                'rating' => $room->avg_rating
+                    ? round($room->avg_rating, 1)
+                    : null,
+
+                'cover_image' => optional($room->images->first())->path,
+            ];
         });
-            
-        return response()->json($room);
+
+        return response()->json($rooms);
     }
 
-    public function show($id){
-        $room = Room::with('images')->findOrFail($id);
+    public function show($id)
+    {
+        $room = Room::query()
+            ->leftJoin('bookings', 'bookings.room_id', '=', 'rooms.id')
+            ->leftJoin('ratings', function ($join) {
+                $join->on('ratings.booking_id', '=', 'bookings.id')
+                    ->where('ratings.is_visible', true);
+            })
+            ->select('rooms.*')
+            ->selectRaw('
+                AVG(ratings.rating) as avg_rating,
+                COUNT(ratings.id) as total_ratings
+            ')
+            ->where('rooms.id', $id)
+            ->groupBy('rooms.id')
+            ->with('images')
+            ->firstOrFail();
 
         return response()->json([
             'id' => $room->id,
             'name' => $room->name,
             'description' => $room->description,
             'price_per_day' => $room->price_per_day,
-            'capacity' => $room->capacity,
+            'type' => $room->type,
+            'facilities' => $room->facilities,
+            'location' => $room->location,
+
+            'rating' => $room->avg_rating
+                ? round($room->avg_rating, 1)
+                : null,
+
+            'total_ratings' => (int) $room->total_ratings,
+
             'images' => $room->images,
         ]);
     }
+
 }

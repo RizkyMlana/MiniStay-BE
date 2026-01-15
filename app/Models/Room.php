@@ -10,9 +10,13 @@ class Room extends Model
         'name',
         'description',
         'price_per_day',
-        'capacity,'
+        'type',
+        'facilities',
+        'location'
     ];
-
+    protected $casts = [
+        'facilities' => 'array',
+    ];
     public function images(){
         return $this->hasMany(RoomImage::class);
     }

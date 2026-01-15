@@ -12,10 +12,19 @@ class AdminRoomController extends Controller
             'name' => 'required|string',
             'description' => 'nullable|string',
             'price_per_day' => 'required|numeric',
-            'capacity' => 'required|integer',
+            'type' => 'required|string',
+            'facilities' => 'nullable|array',
+            'location' => 'required|string',
         ]);
 
-        $room = Room::create($request->all());
+        $room = Room::create($request->only([
+            'name',
+            'description',
+            'price_per_day',
+            'type',
+            'facilities',
+            'location',
+        ]));
 
         return response()->json($room, 201);
     }
@@ -26,7 +35,9 @@ class AdminRoomController extends Controller
             'name',
             'description',
             'price_per_day',
-            'capacity'
+            'type',
+            'facilities',
+            'location',
         ]));
 
         return response()->json($room);

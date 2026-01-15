@@ -56,4 +56,5 @@ class RatingController extends Controller
 
         return response()->json($rating);
     }
+    
 }
