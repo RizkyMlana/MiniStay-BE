@@ -10,55 +10,64 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
-    public function daily(Request $request){
+    public function daily(Request $request)
+    {
         $date = $request->query('date', now()->toDateString());
-        $total = Payment::whereDate('paid_at', $date)
+
+        $totalIncome = Payment::query()
+            ->whereDate('paid_at', $date)
             ->where('status', 'confirmed')
             ->sum('amount');
 
         return response()->json([
             'date' => $date,
-            'total_income' => $total,
+            'total_income' => $totalIncome,
         ]);
     }
 
-    public function weekly(Request $request){
+    public function weekly(Request $request)
+    {
         $start = Carbon::parse($request->query('start'))->startOfDay();
-        $end = Carbon::parse($request->query('end'))->endOfDay();
+        $end   = Carbon::parse($request->query('end'))->endOfDay();
 
-        $total = Payment::whereBetween('paid_at', [$start, $end])
+        $totalIncome = Payment::query()
+            ->whereBetween('paid_at', [$start, $end])
             ->where('status', 'confirmed')
             ->sum('amount');
-        
+
         return response()->json([
             'start' => $start->toDateString(),
             'end' => $end->toDateString(),
-            'total_income' => $total,
+            'total_income' => $totalIncome,
         ]);
     }
 
-    public function monthly(Request $request){
+    public function monthly(Request $request)
+    {
         $month = Carbon::parse($request->query('month', now()));
 
-        $total = Payment::whereYear('paid_at', $month->year)
+        $totalIncome = Payment::query()
+            ->whereYear('paid_at', $month->year)
             ->whereMonth('paid_at', $month->month)
             ->where('status', 'confirmed')
             ->sum('amount');
-        
+
         return response()->json([
             'month' => $month->format('Y-m'),
-            'total_income' => $total,
+            'total_income' => $totalIncome,
         ]);
     }
 
-    public function topRooms(){
-        $data = Booking::select('room_id', DB::raw('COUNT(*) as total_bookings'))
+    public function topRooms()
+    {
+        $topRooms = Booking::query()
+            ->select('room_id', DB::raw('COUNT(*) as total_bookings'))
             ->where('status', 'paid')
             ->groupBy('room_id')
             ->with('room:id,name')
             ->orderByDesc('total_bookings')
             ->get();
 
-        return response()->json($data);
+        return response()->json($topRooms);
     }
 }

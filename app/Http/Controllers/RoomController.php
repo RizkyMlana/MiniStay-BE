@@ -38,6 +38,7 @@ class RoomController extends Controller
                 'rooms.name',
                 'rooms.price_per_day',
                 'rooms.type',
+                'rooms.facilities',
                 'rooms.location'
             )
             ->selectRaw('AVG(ratings.rating) as avg_rating')
