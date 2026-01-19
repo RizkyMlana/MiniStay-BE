@@ -64,7 +64,7 @@ Route::middleware(['auth:sanctum', RoleMiddleware::class. ':admin'])
 
     // ROOM BLOCKS
     Route::post('/room-blocks', [RoomBlockController::class, 'store']);
-    Route::get('/room-date', [RoomBlockController::class, 'getRoomBlocks']);
+    Route::get('/room-date/{roomId}', [RoomBlockController::class, 'getRoomBlocks']);
 
     // BOOKINGS (ADMIN)
     Route::get('/bookings', [BookingController::class, 'index']);
