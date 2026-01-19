@@ -70,6 +70,8 @@ class RoomController extends Controller
                     : null,
 
                 'cover_image' => optional($room->images->first())->path,
+                'facilities' => is_array($room->facilities) ? $room->facilities : json_decode($room->facilities, true),
+                'description' => $room->description,
             ];
         });
 
