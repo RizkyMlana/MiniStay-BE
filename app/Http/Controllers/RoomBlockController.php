@@ -22,29 +22,18 @@ class RoomBlockController extends Controller
     public function getRoomBlocks($roomId)
     {
         $blocks = RoomBlock::where('room_id', $roomId)->get();
-
         $today = now()->startOfDay();
-
         $calendarData = [];
 
         foreach ($blocks as $block) {
-            $start = \Carbon\Carbon::parse($block->start_date);
-            $end = \Carbon\Carbon::parse($block->end_date);
-
-            // loop tiap tanggal dari start sampai end
-            for ($date = $start; $date->lte($end); $date->addDay()) {
-                if ($date->lt($today)) {
-                    $status = 'kadaluarsa';
-                } else {
-                    $status = 'terisi';
-                }
-
-                $calendarData[] = [
-                    'date' => $date->format('Y-m-d'),
-                    'status' => $status
-                ];
+            $period = \Carbon\CarbonPeriod::create($block->start_date, $block->end_date);
+            foreach ($period as $date) {
+                $calendarData[$date->format('Y-m-d')] = $date->lt($today) ? 'kadaluarsa' : 'terisi';
             }
         }
+
+        // convert associative array ke array untuk json
+        $calendarData = collect($calendarData)->map(fn($status, $date) => ['date'=>$date,'status'=>$status])->values();
 
         return response()->json($calendarData);
     }
