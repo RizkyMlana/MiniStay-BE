@@ -19,4 +19,34 @@ class RoomBlockController extends Controller
 
         return response()->json($block, 201);
     }
+    public function getRoomBlocks($roomId)
+    {
+        $blocks = RoomBlock::where('room_id', $roomId)->get();
+
+        $today = now()->startOfDay();
+
+        $calendarData = [];
+
+        foreach ($blocks as $block) {
+            $start = \Carbon\Carbon::parse($block->start_date);
+            $end = \Carbon\Carbon::parse($block->end_date);
+
+            // loop tiap tanggal dari start sampai end
+            for ($date = $start; $date->lte($end); $date->addDay()) {
+                if ($date->lt($today)) {
+                    $status = 'kadaluarsa';
+                } else {
+                    $status = 'terisi';
+                }
+
+                $calendarData[] = [
+                    'date' => $date->format('Y-m-d'),
+                    'status' => $status
+                ];
+            }
+        }
+
+        return response()->json($calendarData);
+    }
+
 }
