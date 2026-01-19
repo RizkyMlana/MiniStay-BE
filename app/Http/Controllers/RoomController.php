@@ -39,7 +39,8 @@ class RoomController extends Controller
                 'rooms.price_per_day',
                 'rooms.type',
                 'rooms.facilities',
-                'rooms.location'
+                'rooms.location',
+                'rooms.description',
             )
             ->selectRaw('AVG(ratings.rating) as avg_rating')
             ->groupBy(
@@ -48,7 +49,8 @@ class RoomController extends Controller
                 'rooms.price_per_day',
                 'rooms.facilities',
                 'rooms.type',
-                'rooms.location'
+                'rooms.location',
+                'rooms.description'
             )
             ->with(['images' => function ($q) {
                 $q->where('is_cover', true);
