@@ -15,7 +15,7 @@ class ReportController extends Controller
         $date = $request->query('date', now()->toDateString());
 
         $totalIncome = Payment::query()
-            ->whereDate('paid_at', $date)
+            ->whereDate('confirmed_at', $date)
             ->where('status', 'confirmed')
             ->sum('amount');
 
@@ -31,7 +31,7 @@ class ReportController extends Controller
         $end   = Carbon::parse($request->query('end'))->endOfDay();
 
         $totalIncome = Payment::query()
-            ->whereBetween('paid_at', [$start, $end])
+            ->whereBetween('confirmed_at', [$start, $end])
             ->where('status', 'confirmed')
             ->sum('amount');
 
@@ -47,8 +47,8 @@ class ReportController extends Controller
         $month = Carbon::parse($request->query('month', now()));
 
         $totalIncome = Payment::query()
-            ->whereYear('paid_at', $month->year)
-            ->whereMonth('paid_at', $month->month)
+            ->whereYear('confirmed_at', $month->year)
+            ->whereMonth('confirmed_at', $month->month)
             ->where('status', 'confirmed')
             ->sum('amount');
 
