@@ -41,7 +41,7 @@ class ReportController extends Controller
             'total_income' => $totalIncome,
         ]);
     }
-
+    
     public function monthly(Request $request)
     {
         $month = Carbon::parse($request->query('month', now()));
@@ -56,6 +56,69 @@ class ReportController extends Controller
             'month' => $month->format('Y-m'),
             'total_income' => $totalIncome,
         ]);
+    }
+    public function weeklyChart(Request $request)
+    {
+        $start = Carbon::parse($request->query('start'))->startOfDay();
+        $end   = Carbon::parse($request->query('end'))->endOfDay();
+
+        $data = Payment::query()
+            ->selectRaw('DATE(confirmed_at) as date, SUM(amount) as income')
+            ->where('status', 'confirmed')
+            ->whereBetween('confirmed_at', [$start, $end])
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'label'  => Carbon::parse($item->date)->translatedFormat('l'),
+                    'income' => (int) $item->income,
+                ];
+            });
+
+        return response()->json($data);
+    }
+
+    public function monthlyChart(Request $request)
+    {
+        $month = Carbon::parse($request->query('month'));
+
+        $data = Payment::query()
+            ->selectRaw('WEEK(confirmed_at, 1) as week, SUM(amount) as income')
+            ->where('status', 'confirmed')
+            ->whereYear('confirmed_at', $month->year)
+            ->whereMonth('confirmed_at', $month->month)
+            ->groupBy('week')
+            ->orderBy('week')
+            ->get()
+            ->map(function ($item, $index) {
+                return [
+                    'label'  => 'Minggu ' . ($index + 1),
+                    'income' => (int) $item->income,
+                ];
+            });
+
+        return response()->json($data);
+    }
+    public function yearlyChart(Request $request)
+    {
+        $year = $request->query('year', now()->year);
+
+        $data = Payment::query()
+            ->selectRaw('MONTH(confirmed_at) as month, SUM(amount) as income')
+            ->where('status', 'confirmed')
+            ->whereYear('confirmed_at', $year)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'label'  => Carbon::create()->month($item->month)->translatedFormat('M'),
+                    'income' => (int) $item->income,
+                ];
+            });
+
+        return response()->json($data);
     }
 
     public function topRooms()

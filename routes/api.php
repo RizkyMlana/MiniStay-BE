@@ -86,9 +86,9 @@ Route::middleware(['auth:sanctum', RoleMiddleware::class. ':admin'])
 
     // REPORTS
     Route::prefix('reports')->group(function () {
-        Route::get('/daily', [ReportController::class, 'daily']);
-        Route::get('/weekly', [ReportController::class, 'weekly']);
-        Route::get('/monthly', [ReportController::class, 'monthly']);
+        Route::get('/weekly-chart', [ReportController::class, 'weeklyChart']);
+        Route::get('/monthly-chart', [ReportController::class, 'monthlyChart']);
+        Route::get('/yearly-chart', [ReportController::class, 'yearlyChart']);
         Route::get('/top-rooms', [ReportController::class, 'topRooms']);
     });
 
