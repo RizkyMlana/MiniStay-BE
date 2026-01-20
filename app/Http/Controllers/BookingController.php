@@ -112,28 +112,30 @@ class BookingController extends Controller
             ->get();
     }
 
-    public function cancel($id){
+    public function updateStatus(Request $request, $id) {
+        // Validasi status yang diterima
+        $request->validate([
+            'status' => 'required|in:pending_payment,waiting_confirmation,paid,cancelled,completed',
+        ]);
+
         $booking = Booking::findOrFail($id);
 
-        if(in_array($booking->status, ['paid', 'completed'])) {
+        // Opsional: batasi status tertentu kalau perlu
+        if (in_array($booking->status, ['paid', 'completed']) && $request->status === 'cancelled') {
             return response()->json([
-                'message' => 'Cannot cancel'
+                'message' => 'Cannot cancel this booking'
             ], 422);
         }
 
-        DB::transaction(function () use ($booking) {
-            $booking->update([
-                'status' => 'cancelled',
-            ]);
-
-            RoomBlock::where('room_id', $booking->room_id)
-                ->where('start_date', $booking->check_in_date)
-                ->where('end_date', $booking->check_out_date)
-                ->delete();
-        });
+        // Cukup update status saja
+        $booking->update([
+            'status' => $request->status
+        ]);
 
         return response()->json([
-            'message' => 'Booking cancelled'
+            'message' => 'Booking status updated',
+            'booking' => $booking
         ]);
     }
+
 }
