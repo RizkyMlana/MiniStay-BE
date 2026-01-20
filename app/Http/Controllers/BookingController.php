@@ -106,36 +106,36 @@ class BookingController extends Controller
     }
 
 
-    public function index(){
-        return Booking::with(['user', 'room'])
+    public function index()
+    {
+        return Booking::with(['user', 'room', 'payment'])
             ->orderByDesc('created_at')
             ->get();
     }
 
-    public function updateStatus(Request $request, $id) {
-        // Validasi status yang diterima
+    public function updateStatus(Request $request, $id)
+    {
         $request->validate([
-            'status' => 'required|in:pending_payment,waiting_confirmation,paid,cancelled,completed',
+            'status' => 'required|in:completed'
         ]);
 
         $booking = Booking::findOrFail($id);
 
-        // Opsional: batasi status tertentu kalau perlu
-        if (in_array($booking->status, ['paid', 'completed']) && $request->status === 'cancelled') {
+        if ($booking->status !== 'paid') {
             return response()->json([
-                'message' => 'Cannot cancel this booking'
+                'message' => 'Only paid bookings can be completed'
             ], 422);
         }
 
-        // Cukup update status saja
         $booking->update([
-            'status' => $request->status
+            'status' => 'completed'
         ]);
 
         return response()->json([
-            'message' => 'Booking status updated',
+            'message' => 'Booking marked as completed',
             'booking' => $booking
         ]);
     }
+
 
 }

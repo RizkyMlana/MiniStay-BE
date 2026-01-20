@@ -11,23 +11,33 @@ use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
-    public function submit(Request $request, $bookingId){
+    /**
+     * USER — Submit payment
+     */
+    public function submit(Request $request, $bookingId)
+    {
         $booking = Booking::where('id', $bookingId)
             ->where('user_id', $request->user()->id)
             ->firstOrFail();
-        
-        if($booking->status !== 'pending_request') {
+
+        if ($booking->status !== 'pending_payment') {
             return response()->json([
                 'message' => 'Booking not eligible for payment'
+            ], 422);
+        }
+
+        if ($booking->payment()->where('status', 'pending')->exists()) {
+            return response()->json([
+                'message' => 'Payment already submitted'
             ], 422);
         }
 
         DB::transaction(function () use ($booking) {
             Payment::create([
                 'booking_id' => $booking->id,
-                'amount' => $booking->total_price,
-                'method' => 'manual_transfer',
-                'status' => 'pending',
+                'amount'     => $booking->total_price,
+                'method'     => 'manual_transfer',
+                'status'     => 'pending',
             ]);
 
             $booking->update([
@@ -40,17 +50,40 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function index(){
+    /**
+     * ADMIN — List all payments
+     */
+    public function index(Request $request)
+    {
+        if (!$request->user()->is_admin) {
+            abort(403, 'Unauthorized');
+        }
+
         return Payment::with(['booking.user', 'booking.room'])
             ->orderByDesc('created_at')
             ->get();
     }
 
-    public function confirm(Request $request, $id){
-        $payment = Payment::findOrFail($id);
+    /**
+     * ADMIN — Confirm payment
+     */
+    public function confirm(Request $request, $id)
+    {
+        if (!$request->user()->is_admin) {
+            abort(403, 'Unauthorized');
+        }
+
+        $payment = Payment::with('booking')->findOrFail($id);
+
         if ($payment->status !== 'pending') {
             return response()->json([
                 'message' => 'Payment already processed'
+            ], 422);
+        }
+
+        if ($payment->booking->status !== 'waiting_confirmation') {
+            return response()->json([
+                'message' => 'Booking not eligible for confirmation'
             ], 422);
         }
 
@@ -71,11 +104,26 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function reject($id){
-        $payment = Payment::findOrFail($id);
+    /**
+     * ADMIN — Reject payment
+     */
+    public function reject(Request $request, $id)
+    {
+        if (!$request->user()->is_admin) {
+            abort(403, 'Unauthorized');
+        }
+
+        $payment = Payment::with('booking')->findOrFail($id);
+
         if ($payment->status !== 'pending') {
             return response()->json([
                 'message' => 'Payment already processed'
+            ], 422);
+        }
+
+        if ($payment->booking->status !== 'waiting_confirmation') {
+            return response()->json([
+                'message' => 'Booking not eligible for rejection'
             ], 422);
         }
 
