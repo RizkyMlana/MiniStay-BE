@@ -11,9 +11,6 @@ use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
-    /**
-     * USER — Submit payment
-     */
     public function submit(Request $request, $bookingId)
     {
         $booking = Booking::where('id', $bookingId)
@@ -50,40 +47,20 @@ class PaymentController extends Controller
         ]);
     }
 
-    /**
-     * ADMIN — List all payments
-     */
-    public function index(Request $request)
+    public function index()
     {
-        if (!$request->user()->is_admin) {
-            abort(403, 'Unauthorized');
-        }
-
         return Payment::with(['booking.user', 'booking.room'])
             ->orderByDesc('created_at')
             ->get();
     }
 
-    /**
-     * ADMIN — Confirm payment
-     */
     public function confirm(Request $request, $id)
     {
-        if (!$request->user()->is_admin) {
-            abort(403, 'Unauthorized');
-        }
-
         $payment = Payment::with('booking')->findOrFail($id);
 
         if ($payment->status !== 'pending') {
             return response()->json([
                 'message' => 'Payment already processed'
-            ], 422);
-        }
-
-        if ($payment->booking->status !== 'waiting_confirmation') {
-            return response()->json([
-                'message' => 'Booking not eligible for confirmation'
             ], 422);
         }
 
@@ -104,26 +81,13 @@ class PaymentController extends Controller
         ]);
     }
 
-    /**
-     * ADMIN — Reject payment
-     */
-    public function reject(Request $request, $id)
+    public function reject($id)
     {
-        if (!$request->user()->is_admin) {
-            abort(403, 'Unauthorized');
-        }
-
         $payment = Payment::with('booking')->findOrFail($id);
 
         if ($payment->status !== 'pending') {
             return response()->json([
                 'message' => 'Payment already processed'
-            ], 422);
-        }
-
-        if ($payment->booking->status !== 'waiting_confirmation') {
-            return response()->json([
-                'message' => 'Booking not eligible for rejection'
             ], 422);
         }
 

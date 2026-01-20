@@ -69,7 +69,8 @@ Route::middleware(['auth:sanctum', RoleMiddleware::class. ':admin'])
 
     // BOOKINGS (ADMIN)
     Route::get('/bookings', [BookingController::class, 'index']);
-    Route::put('/bookings/{id}/status', [BookingController::class, 'updateStatus']);
+    Route::put('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
+    Route::post('/bookings/{id}/complete', [BookingController::class, 'complete']);
 
     // PAYMENTS
     Route::get('/payments', [PaymentController::class, 'index']);

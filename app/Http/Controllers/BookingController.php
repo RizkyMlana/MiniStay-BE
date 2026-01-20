@@ -113,17 +113,32 @@ class BookingController extends Controller
             ->get();
     }
 
-    public function updateStatus(Request $request, $id)
+    public function cancel($id)
     {
-        $request->validate([
-            'status' => 'required|in:completed'
+        $booking = Booking::findOrFail($id);
+
+        if (in_array($booking->status, ['paid', 'completed'])) {
+            return response()->json([
+                'message' => 'Cannot cancel a paid or completed booking'
+            ], 422);
+        }
+
+        $booking->update([
+            'status' => 'cancelled'
         ]);
 
+        return response()->json([
+            'message' => 'Booking cancelled'
+        ]);
+    }
+
+    public function complete($id)
+    {
         $booking = Booking::findOrFail($id);
 
         if ($booking->status !== 'paid') {
             return response()->json([
-                'message' => 'Only paid bookings can be completed'
+                'message' => 'Only paid booking can be completed'
             ], 422);
         }
 
@@ -132,8 +147,7 @@ class BookingController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Booking marked as completed',
-            'booking' => $booking
+            'message' => 'Booking marked as completed'
         ]);
     }
 
