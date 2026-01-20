@@ -19,6 +19,15 @@ class RoomBlockController extends Controller
 
         return response()->json($block, 201);
     }
+
+    public function destroy($id){
+        $block = RoomBlock::findOrFail($id);
+        $block->delete();
+
+        return response()->json([
+            'message' => 'Block deleted'
+        ], 200);
+    }
     public function getRoomBlocks($roomId)
     {
         $blocks = RoomBlock::where('room_id', $roomId)->get();
