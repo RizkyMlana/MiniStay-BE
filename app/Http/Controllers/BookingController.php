@@ -107,41 +107,16 @@ class BookingController extends Controller
 
 
     public function index()
-{
-    $bookings = Booking::query()
-        ->with([
+    {
+        return Booking::with([
             'user:id,name',
             'room:id,name',
-            'payments' => function ($q) {
-                $q->latest()->limit(1);
-            }
+            'payment:id,booking_id,status'
         ])
         ->orderByDesc('created_at')
-        ->get()
-        ->map(function ($booking) {
-            $payment = $booking->payments->first();
+        ->get();
+    }
 
-            return [
-                'id' => $booking->id,
-                'status' => $booking->status,
-                'total_price' => $booking->total_price,
-                'check_in_date' => $booking->check_in_date,
-                'check_out_date' => $booking->check_out_date,
-                'user' => [
-                    'name' => $booking->user->name,
-                ],
-                'room' => [
-                    'name' => $booking->room->name,
-                ],
-                'payment' => $payment ? [
-                    'id' => $payment->id,
-                    'status' => $payment->status,
-                ] : null,
-            ];
-        });
-
-    return response()->json($bookings);
-}
 
 
     public function cancel($id)
