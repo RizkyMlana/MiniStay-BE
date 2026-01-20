@@ -106,11 +106,19 @@ class BookingController extends Controller
     }
 
 
-    public function index(){
-        return Booking::with(['user', 'room'])
-            ->orderByDesc('created_at')
-            ->get();
+    public function index(Request $request){
+        $query = Booking::with(['user', 'room'])->orderByDesc('created_at');
+
+        if($request->has('status')){
+            $query->where('status', $request->status);
+        }
+        if($request->has('from_date') && $request->has('to_date')){
+            $query->whereBetween('check_in_date', [$request->from_date, $request->to_date]);
+        }
+
+        return $query->paginate(20);
     }
+
 
     public function cancel($id){
         $booking = Booking::findOrFail($id);
