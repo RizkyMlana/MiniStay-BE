@@ -7,64 +7,83 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Validation\ValidationException;
 
 
 class AuthController extends Controller
 {
-    public function requestOtp(Request $request) {
+    public function requestOtp(Request $request)
+    {
         $request->validate([
-            'name' => 'required|string',
+            'name'  => 'required|string',
             'phone' => 'required|string',
         ]);
 
-        $otp = rand(100000, 999999);
+        $phone  = WhatsApp::normalizePhone($request->phone);
+        $otpKey = "otp:{$phone}";
 
-        Cache::put('otp_' . $request->phone, $otp, now()->addMinutes(5));
+        if (Cache::has($otpKey)) {
+            return response()->json([
+                'message' => 'OTP masih aktif. Silakan cek WhatsApp Anda.'
+            ], 429);
+        }
 
-        WhatsApp::send(
-            $request->phone,
-            "Kode OTP kamu: {$otp}"
-        );
+        $otp = random_int(100000, 999999);
+
+        Cache::put($otpKey, [
+            'hash' => Hash::make($otp),
+            'name' => $request->name,
+        ], now()->addMinutes(5));
+
+        WhatsApp::sendOtp($phone, (string) $otp);
 
         return response()->json([
-            'message' => 'OTP Sent'
+            'message' => 'OTP sent'
         ]);
-
     }
 
-    public function verifyOtp(Request $request){
+
+
+    public function verifyOtp(Request $request)
+    {
         $request->validate([
-            'name' => 'required',
             'phone' => 'required|string',
-            'otp' => 'required|numeric',
+            'otp'   => 'required|numeric',
         ]);
 
-        $cachedOtp = Cache::get('otp_' . $request->phone);
+        $phone  = WhatsApp::normalizePhone($request->phone);
+        $otpKey = "otp:{$phone}";
 
-        if(!$cachedOtp || $cachedOtp != $request->otp) {
+        $data = Cache::get($otpKey);
+
+        if (
+            !$data ||
+            !Hash::check($request->otp, $data['hash'])
+        ) {
             return response()->json([
                 'message' => 'Invalid or expired OTP'
             ], 422);
         }
 
         $user = User::firstOrCreate(
-            ['phone' => $request->phone],
+            ['phone' => $phone],
             [
-                'name' => $request->name,
+                'name' => $data['name'],
                 'role' => 'user',
             ]
         );
 
-        Cache::forget('otp_' . $request->phone);
+        Cache::forget($otpKey);
 
         $token = $user->createToken('user-token')->plainTextToken;
 
         return response()->json([
             'token' => $token,
-            'user' => $user
+            'user'  => $user
         ]);
     }
+
+
+
     public function adminLogin(Request $request){
         $request->validate([
             'name' => 'required|string',
