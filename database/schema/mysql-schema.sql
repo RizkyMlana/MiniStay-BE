@@ -16,6 +16,7 @@ CREATE TABLE `bookings` (
   `check_out_date` date NOT NULL,
   `status` enum('pending_payment','waiting_confirmation','paid','cancelled','completed') COLLATE utf8mb4_unicode_ci NOT NULL,
   `total_price` int unsigned NOT NULL,
+  `payment_method` enum('manual_transfer') COLLATE utf8mb4_unicode_ci NOT NULL,
   `payment_deadline` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -132,26 +133,6 @@ CREATE TABLE `password_reset_tokens` (
   `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `payments`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `payments` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `booking_id` bigint unsigned NOT NULL,
-  `amount` int unsigned NOT NULL,
-  `method` enum('manual_transfer') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` enum('pending','confirmed','rejected') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `confirmed_by` bigint unsigned DEFAULT NULL,
-  `confirmed_at` timestamp NULL DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `payments_booking_id_foreign` (`booking_id`),
-  KEY `payments_confirmed_by_foreign` (`confirmed_by`),
-  CONSTRAINT `payments_booking_id_foreign` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `payments_confirmed_by_foreign` FOREIGN KEY (`confirmed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `personal_access_tokens`;
@@ -280,7 +261,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (4,'2025_11_25_0000
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (5,'2025_11_25_000001_create_room_images',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (6,'2025_11_25_000002_create_room_blocks',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (7,'2025_11_25_000003_create_bookings',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (8,'2025_11_25_000004_create_payments',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (9,'2025_11_25_000006_create_ratings',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (10,'2025_11_25_000007_create_messages',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (11,'2025_11_26_074052_create_personal_access_tokens_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (8,'2025_11_25_000006_create_ratings',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (9,'2025_11_25_000007_create_messages',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (10,'2025_11_26_074052_create_personal_access_tokens_table',1);
