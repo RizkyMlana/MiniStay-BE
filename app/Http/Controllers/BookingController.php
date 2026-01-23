@@ -127,7 +127,7 @@ class BookingController extends Controller
             'room:id, name',
 
         ])
-        ->orderByDesc('created')
+        ->orderByDesc('created_at')
         ->get();
     }
 
