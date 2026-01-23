@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminRatingController;
 use App\Http\Controllers\AdminRoomController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\PaymentController;
@@ -65,9 +66,14 @@ Route::middleware(['auth:sanctum', RoleMiddleware::class. ':admin'])
     Route::put('/rooms/{roomId}/images', [RoomImageController::class, 'update']);
 
     // ROOM BLOCKS
-    Route::post('/room-blocks', [RoomBlockController::class, 'store']);
-    Route::get('/room-date/{roomId}', [RoomBlockController::class, 'getRoomBlocks']);
-    Route::delete('/room-date/{id}', [RoomBlockController::class, 'destroy']);
+    // Route::post('/room-blocks', [RoomBlockController::class, 'store']);
+    // Route::get('/room-date/{roomId}', [RoomBlockController::class, 'getRoomBlocks']);
+    // Route::delete('/room-date/{id}', [RoomBlockController::class, 'destroy']);
+
+
+    Route::get('/calendar', [CalendarController::class, 'calendar']);
+    Route::post('/room-blocks', [CalendarController::class, 'store']);
+    Route::delete('/room-blocks/{id}', [CalendarController::class, 'destroy']);
 
     // BOOKINGS (ADMIN)
     Route::get('/bookings', [BookingController::class, 'index']);
