@@ -119,12 +119,15 @@ class BookingController extends Controller
 
     public function index()
     {
+        Booking::where('status', 'paid')
+            ->whereDate('check_out_date', '<', now())
+            ->update(['status' => 'completed']);
         return Booking::with([
-            'user:id,name',
-            'room:id,name',
-            'payment:id,booking_id,status'
+            'user:id, name',
+            'room:id, name',
+
         ])
-        ->orderByDesc('created_at')
+        ->orderByDesc('created')
         ->get();
     }
 
@@ -134,15 +137,21 @@ class BookingController extends Controller
     {
         $booking = Booking::findOrFail($id);
 
-        if (in_array($booking->status, ['paid', 'completed'])) {
+        if ($booking->status !== 'pending_payment') {
             return response()->json([
-                'message' => 'Cannot cancel a paid or completed booking'
+                'message' => 'Only pending booking can be cancelled'
             ], 422);
         }
 
-        $booking->update([
-            'status' => 'cancelled'
-        ]);
+        DB::transaction(function () use ($booking) {
+            $booking->update(['status' => 'cancelled']);
+
+            RoomBlock::where('room_id', $booking->room_id)
+                ->where('reason', 'booking')
+                ->where('start_date', $booking->check_in_date)
+                ->where('end_date', $booking->check_out_date)
+                ->delete();
+        });
 
         return response()->json([
             'message' => 'Booking cancelled'
@@ -168,5 +177,24 @@ class BookingController extends Controller
         ]);
     }
 
+    public function markPaid($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        if ($booking->status !== 'pending_payment') {
+            return response()->json([
+                'message' => 'Only pending booking can be marked as paid'
+            ], 422);
+        }
+
+        $booking->update([
+            'status' => 'paid',
+            'paid_at' => now(),
+        ]);
+
+        return response()->json([
+            'message' => 'Booking marked as paid'
+        ]);
+    }
 
 }
