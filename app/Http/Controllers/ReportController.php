@@ -120,7 +120,7 @@ class ReportController extends Controller
     {
         $topRooms = Booking::query()
             ->select('room_id', DB::raw('COUNT(*) as total_bookings'))
-            ->where('status', 'completed')
+            ->where('status', 'paid')
             ->groupBy('room_id')
             ->with('room:id,name')
             ->orderByDesc('total_bookings')
