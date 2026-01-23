@@ -79,54 +79,40 @@ class RoomController extends Controller
     }
 
     public function show($id)
-{
-    $room = Room::query()
-        ->leftJoin('bookings', 'bookings.room_id', '=', 'rooms.id')
-        ->leftJoin('ratings', function ($join) {
-            $join->on('ratings.booking_id', '=', 'bookings.id')
-                ->where('ratings.is_visible', true);
-        })
-        ->select('rooms.*')
-        ->selectRaw('
-            AVG(ratings.rating) as avg_rating,
-            COUNT(ratings.id) as total_ratings
-        ')
-        ->where('rooms.id', $id)
-        ->groupBy('rooms.id')
-        ->with(['images', 'bookings.ratings' => function($q) {
-            $q->where('is_visible', true)
-              ->with('user:id,name'); // ambil nama user juga
-        }])
-        ->firstOrFail();
+    {
+        $room = Room::with('images')->findOrFail($id);
 
-    // Kumpulin ulasan yang visible
-    $reviews = [];
-    foreach ($room->bookings as $booking) {
-        foreach ($booking->ratings as $rating) {
-            $reviews[] = [
-                'id' => $rating->id,
-                'guestName' => $rating->user->name ?? 'Anonim',
-                'rating' => $rating->rating,
-                'comment' => $rating->comment,
-                'date' => $rating->created_at->format('Y-m-d'),
-            ];
-        }
+        $reviews = $room->bookings()
+            ->whereHas('rating', fn($q) => $q->where('is_visible', true))
+            ->with(['rating', 'user'])
+            ->get()
+            ->map(function($b) {
+                return [
+                    'id' => $b->rating->id,
+                    'guestName' => $b->user->name ?? 'Tamu',
+                    'rating' => $b->rating->rating,
+                    'comment' => $b->rating->comment,
+                    'date' => $b->created_at->format('Y-m-d'),
+                ];
+            });
+
+        $avgRating = $reviews->avg('rating');
+        $totalRatings = $reviews->count();
+
+        return response()->json([
+            'id' => $room->id,
+            'name' => $room->name,
+            'description' => $room->description,
+            'price_per_day' => $room->price_per_day,
+            'type' => $room->type,
+            'facilities' => $room->facilities,
+            'location' => $room->location,
+            'images' => $room->images,
+            'rating' => $avgRating ? round($avgRating, 1) : null,
+            'total_ratings' => $totalRatings,
+            'reviews' => $reviews,
+        ]);
     }
-
-    return response()->json([
-        'id' => $room->id,
-        'name' => $room->name,
-        'description' => $room->description,
-        'price_per_day' => $room->price_per_day,
-        'type' => $room->type,
-        'facilities' => $room->facilities,
-        'location' => $room->location,
-        'rating' => $room->avg_rating ? round($room->avg_rating, 1) : null,
-        'total_ratings' => (int) $room->total_ratings,
-        'images' => $room->images,
-        'reviews' => $reviews, // ini yang baru ditambahkan
-    ]);
-}
 
 
 }
