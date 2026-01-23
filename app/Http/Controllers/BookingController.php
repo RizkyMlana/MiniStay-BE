@@ -75,12 +75,6 @@ class BookingController extends Controller
                     'payment_deadline' => now()->addHours(6),
                 ]);
 
-                RoomBlock::create([
-                    'room_id'    => $room->id,
-                    'start_date' => $checkIn,
-                    'end_date'   => $checkOut,
-                    'reason'     => 'booking',
-                ]);
 
                 return $booking;
             });
