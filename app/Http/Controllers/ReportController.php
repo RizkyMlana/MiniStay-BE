@@ -58,7 +58,7 @@ class ReportController extends Controller
 
         $data = Booking::query()
             ->selectRaw('DATE(updated_at) as date, SUM(total_price) as income')
-            ->where('status', 'completed')
+            ->where('status', 'paid')
             ->whereBetween('updated_at', [$start, $end])
             ->groupBy('date')
             ->orderBy('date')
@@ -79,7 +79,7 @@ class ReportController extends Controller
 
         $data = Booking::query()
             ->selectRaw('WEEK(updated_at, 1) as week, SUM(total_price) as income')
-            ->where('status', 'completed')
+            ->where('status', 'paid')
             ->whereYear('updated_at', $month->year)
             ->whereMonth('updated_at', $month->month)
             ->groupBy('week')
@@ -100,7 +100,7 @@ class ReportController extends Controller
 
         $data = Booking::query()
             ->selectRaw('MONTH(updated_at) as month, SUM(total_price) as income')
-            ->where('status', 'completed')
+            ->where('status', 'paid')
             ->whereYear('updated_at', $year)
             ->groupBy('month')
             ->orderBy('month')
