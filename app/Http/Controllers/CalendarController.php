@@ -23,7 +23,7 @@ class CalendarController extends Controller
 
         // 1. BOOKINGS (read-only)
         $bookings = Booking::where('room_id', $roomId)
-            ->whereIn('status', ['pending_payment', 'waiting_confirmation', 'paid'])
+            ->whereIn('status', ['pending_payment', 'paid'])
             ->where('check_in_date', '<=', $end)
             ->where('check_out_date', '>=', $start)
             ->get()
@@ -34,8 +34,6 @@ class CalendarController extends Controller
                     'end'   => $b->check_out_date->toDateString(),
                 ];
             });
-
-        // 2. ADMIN BLOCKS
         $blocks = RoomBlock::where('room_id', $roomId)
             ->where('start_date', '<=', $end)
             ->where('end_date', '>=', $start)
@@ -84,7 +82,4 @@ class CalendarController extends Controller
             'message' => 'Block removed',
         ]);
     }
-
-
-
 }
