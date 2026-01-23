@@ -10,62 +10,15 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
-    public function daily(Request $request)
-    {
-        $date = $request->query('date', now()->toDateString());
-
-        $totalIncome = Payment::query()
-            ->whereDate('confirmed_at', $date)
-            ->where('status', 'confirmed')
-            ->sum('amount');
-
-        return response()->json([
-            'date' => $date,
-            'total_income' => $totalIncome,
-        ]);
-    }
-
-    public function weekly(Request $request)
-    {
-        $start = Carbon::parse($request->query('start'))->startOfDay();
-        $end   = Carbon::parse($request->query('end'))->endOfDay();
-
-        $totalIncome = Payment::query()
-            ->whereBetween('confirmed_at', [$start, $end])
-            ->where('status', 'confirmed')
-            ->sum('amount');
-
-        return response()->json([
-            'start' => $start->toDateString(),
-            'end' => $end->toDateString(),
-            'total_income' => $totalIncome,
-        ]);
-    }
-    
-    public function monthly(Request $request)
-    {
-        $month = Carbon::parse($request->query('month', now()));
-
-        $totalIncome = Payment::query()
-            ->whereYear('confirmed_at', $month->year)
-            ->whereMonth('confirmed_at', $month->month)
-            ->where('status', 'confirmed')
-            ->sum('amount');
-
-        return response()->json([
-            'month' => $month->format('Y-m'),
-            'total_income' => $totalIncome,
-        ]);
-    }
     public function weeklyChart(Request $request)
     {
         $start = Carbon::parse($request->query('start'))->startOfDay();
         $end   = Carbon::parse($request->query('end'))->endOfDay();
 
-        $data = Payment::query()
-            ->selectRaw('DATE(confirmed_at) as date, SUM(amount) as income')
-            ->where('status', 'confirmed')
-            ->whereBetween('confirmed_at', [$start, $end])
+        $data = Booking::query()
+            ->selectRaw('DATE(updated_at) as date, SUM(total_price) as income')
+            ->where('status', 'completed')
+            ->whereBetween('updated_at', [$start, $end])
             ->groupBy('date')
             ->orderBy('date')
             ->get()
@@ -83,11 +36,11 @@ class ReportController extends Controller
     {
         $month = Carbon::parse($request->query('month'));
 
-        $data = Payment::query()
-            ->selectRaw('WEEK(confirmed_at, 1) as week, SUM(amount) as income')
-            ->where('status', 'confirmed')
-            ->whereYear('confirmed_at', $month->year)
-            ->whereMonth('confirmed_at', $month->month)
+        $data = Booking::query()
+            ->selectRaw('WEEK(updated_at, 1) as week, SUM(total_price) as income')
+            ->where('status', 'completed')
+            ->whereYear('updated_at', $month->year)
+            ->whereMonth('updated_at', $month->month)
             ->groupBy('week')
             ->orderBy('week')
             ->get()
@@ -104,10 +57,10 @@ class ReportController extends Controller
     {
         $year = $request->query('year', now()->year);
 
-        $data = Payment::query()
-            ->selectRaw('MONTH(confirmed_at) as month, SUM(amount) as income')
-            ->where('status', 'confirmed')
-            ->whereYear('confirmed_at', $year)
+        $data = Booking::query()
+            ->selectRaw('MONTH(updated_at) as month, SUM(total_price) as income')
+            ->where('status', 'completed')
+            ->whereYear('updated_at', $year)
             ->groupBy('month')
             ->orderBy('month')
             ->get()
@@ -118,6 +71,7 @@ class ReportController extends Controller
                 ];
             });
 
+
         return response()->json($data);
     }
 
@@ -125,7 +79,7 @@ class ReportController extends Controller
     {
         $topRooms = Booking::query()
             ->select('room_id', DB::raw('COUNT(*) as total_bookings'))
-            ->where('status', 'paid')
+            ->where('status', 'completed')
             ->groupBy('room_id')
             ->with('room:id,name')
             ->orderByDesc('total_bookings')
