@@ -25,6 +25,22 @@ class RoomImageController extends Controller
 
         return response()->json($image, 201);
     }
+    public function update(Request $request, $id) {
+        $image = RoomImage::findOrFail($id);
+
+        $request->validate([
+            'image' => 'nullable|image|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $path = 'rooms/' . uniqid() . '.' . $request->image->extension();
+            $url = Supabase::upload($request->image, $path);
+            $image->update(['path' => $url]);
+        }
+
+        return response()->json($image);
+    }
+
 
     public function setCover($id){
         $image = RoomImage::findOrFail($id);
