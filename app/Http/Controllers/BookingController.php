@@ -123,8 +123,8 @@ class BookingController extends Controller
             ->whereDate('check_out_date', '<', now())
             ->update(['status' => 'completed']);
         return Booking::with([
-            'user:id, name',
-            'room:id, name',
+            'user:id,name',
+            'room:id,name',
 
         ])
         ->orderByDesc('created_at')
