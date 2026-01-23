@@ -110,6 +110,8 @@ class BookingController extends Controller
             ->get();
     }
 
+    
+
 
     public function index()
     {
