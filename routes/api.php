@@ -39,6 +39,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/messages', [ChatController::class, 'store']);
     Route::post('/messages/{id}/read', [ChatController::class, 'markAsRead']);
 
+    Route::get('/room-date/{roomId}', [RoomBlockController::class, 'getRoomBlocks']);
+
+
     // BOOKINGS (USER)
     Route::post('/bookings', [BookingController::class, 'store']);
     Route::get('/bookings', [BookingController::class, 'index']);
