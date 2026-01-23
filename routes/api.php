@@ -40,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // BOOKINGS (USER)
     Route::post('/bookings', [BookingController::class, 'store']);
+    Route::get('/bookings', [BookingController::class, 'index']);
     Route::get('/bookings/me', [BookingController::class, 'myBookings']);
     Route::post('/bookings/{id}/pay', [PaymentController::class, 'submit']);
 

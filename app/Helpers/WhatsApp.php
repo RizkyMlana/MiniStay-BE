@@ -133,4 +133,20 @@ class WhatsApp
     {
         return substr($phone, 0, 4) . '****' . substr($phone, -2);
     }
+
+    public static function sendBookingConfirmation(
+        string $phone,
+        string $bookingCode,
+        string $roomName,
+        float $totalPrice,
+        \Carbon\Carbon $paymentDeadline
+    ): ?object {
+        $title = "Konfirmasi Booking";
+        $message = "Booking kamu ($bookingCode) untuk kamar $roomName berhasil. \n".
+                    "Total pembayaran: Rp " . number_format($totalPrice, 0, ',', '.') . "\n".
+                    "Silakan lakukan pembayaran sebelum " . $paymentDeadline->format('d-m-Y H:i') . "\n".
+                    "Setelah transfer, booking akan dikonfirmasi.";
+
+        return self::sendNotification($phone, $title, $message);
+    }
 }

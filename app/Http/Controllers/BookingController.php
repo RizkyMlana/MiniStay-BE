@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Room;
 use App\Models\RoomBlock;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -92,6 +93,20 @@ class BookingController extends Controller
 
             return $booking;
         });
+        try {
+            WhatsApp::sendBookingConfirmation(
+                $user->phone,
+                $booking->booking_code,
+                $room->name,
+                $totalPrice,
+                $booking->payment_deadline
+            );
+        } catch (\Throwable $e) {
+            Log::error('Failed to send WA booking confirmation', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return response()->json($booking, 201);
     }
