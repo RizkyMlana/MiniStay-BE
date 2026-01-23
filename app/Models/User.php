@@ -45,9 +45,6 @@ class User extends Authenticatable
     public function messages(){
         return $this->hasMany(Message::class, 'sender_id');
     }
-    public function confirmedPayments(){
-        return $this->hasMany(Payment::class, 'confirmed_by');
-    }
 
 
     

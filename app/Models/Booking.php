@@ -30,10 +30,6 @@ class Booking extends Model
         return $this->belongsTo(Room::class);
     }
 
-    public function payment(){
-        return $this->hasOne(Payment::class);
-    }
-
     public function rating(){
         return $this->hasOne(Rating::class);
     }

@@ -42,7 +42,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings', [BookingController::class, 'store']);
     Route::get('/bookings', [BookingController::class, 'index']);
     Route::get('/bookings/me', [BookingController::class, 'myBookings']);
-    Route::post('/bookings/{id}/pay', [PaymentController::class, 'submit']);
 
     // RATINGS
     Route::post('/ratings', [RatingController::class, 'store']);
@@ -72,11 +71,6 @@ Route::middleware(['auth:sanctum', RoleMiddleware::class. ':admin'])
     Route::get('/bookings', [BookingController::class, 'index']);
     Route::put('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
     Route::post('/bookings/{id}/complete', [BookingController::class, 'complete']);
-
-    // PAYMENTS
-    Route::get('/payments', [PaymentController::class, 'index']);
-    Route::post('/payments/{id}/confirm', [PaymentController::class, 'confirm']);
-    Route::post('/payments/{id}/reject', [PaymentController::class, 'reject']);
 
     // CHECK-IN
     Route::post('/checkin', [CheckinController::class, 'checkin']);
