@@ -14,103 +14,98 @@ use Illuminate\Support\Str;
 
 class BookingController extends Controller
 {
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $request->validate([
             'room_id' => 'required|exists:rooms,id',
-            'check_in_date' => 'required|date',
-            'check_out_date' => 'required|date|after:check_in_date',
+            'check_in_date' => 'required|date_format:Y-m-d',
+            'check_out_date' => 'required|date_format:Y-m-d|after:check_in_date',
         ]);
 
         $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
 
         $checkIn  = Carbon::parse($request->check_in_date)->startOfDay();
         $checkOut = Carbon::parse($request->check_out_date)->startOfDay();
-
-        $conflictBooking = Booking::where('room_id', $request->room_id)
-            ->whereIn('status', [
-                'pending_payment',
-                'waiting_confirmation',
-                'paid'
-            ])
-            ->where(function ($q) use ($checkIn, $checkOut) {
-                $q->where('check_in_date', '<', $checkOut)
-                  ->where('check_out_date', '>', $checkIn);
-            })
-            ->lockForUpdate()
-            ->exists();
-
-        if ($conflictBooking) {
-            return response()->json([
-                'message' => 'Room not available'
-            ], 422);
-        }
-
-        $conflictBlock = RoomBlock::where('room_id', $request->room_id)
-            ->where('start_date', '<', $checkOut)
-            ->where('end_date', '>', $checkIn)
-            ->exists();
-
-        if ($conflictBlock) {
-            return response()->json([
-                'message' => 'Room is blocked'
-            ], 422);
-        }
 
         $room = Room::findOrFail($request->room_id);
         $days = $checkIn->diffInDays($checkOut);
 
         if ($days < 1) {
-            return response()->json([
-                'message' => 'Minimum 1 night'
-            ], 422);
+            return response()->json(['message' => 'Minimum 1 night'], 422);
         }
 
         $totalPrice = $days * $room->price_per_day;
 
-        $booking = DB::transaction(function () use (
-            $user,
-            $room,
-            $checkIn,
-            $checkOut,
-            $totalPrice
-        ) {
-            $booking = Booking::create([
-                'booking_code'     => 'MS-' . strtoupper(Str::random(8)),
-                'user_id'          => $user->id,
-                'room_id'          => $room->id,
-                'check_in_date'    => $checkIn,
-                'check_out_date'   => $checkOut,
-                'status'           => 'pending_payment',
-                'total_price'      => $totalPrice,
-                'payment_deadline' => now()->addHours(6),
-            ]);
-
-            RoomBlock::create([
-                'room_id'    => $room->id,
-                'start_date' => $checkIn,
-                'end_date'   => $checkOut,
-                'reason'     => 'booking',
-            ]);
-
-            return $booking;
-        });
         try {
-            WhatsApp::sendBookingConfirmation(
-                $user->phone,
-                $booking->booking_code,
-                $room->name,
-                $totalPrice,
-                $booking->payment_deadline
-            );
-        } catch (\Throwable $e) {
-            Log::error('Failed to send WA booking confirmation', [
-                'booking_id' => $booking->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
+            $booking = DB::transaction(function () use ($user, $room, $checkIn, $checkOut, $totalPrice) {
 
-        return response()->json($booking, 201);
+                $conflictBooking = Booking::where('room_id', $room->id)
+                    ->whereIn('status', ['pending_payment','waiting_confirmation','paid'])
+                    ->where(function ($q) use ($checkIn, $checkOut) {
+                        $q->where('check_in_date', '<', $checkOut)
+                        ->where('check_out_date', '>', $checkIn);
+                    })
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($conflictBooking) {
+                    throw new \Exception('Room not available');
+                }
+
+                $conflictBlock = RoomBlock::where('room_id', $room->id)
+                    ->where('start_date', '<', $checkOut)
+                    ->where('end_date', '>', $checkIn)
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($conflictBlock) {
+                    throw new \Exception('Room is blocked');
+                }
+                $booking = Booking::create([
+                    'booking_code'     => 'MS-' . strtoupper(Str::random(8)),
+                    'user_id'          => $user->id,
+                    'room_id'          => $room->id,
+                    'check_in_date'    => $checkIn,
+                    'check_out_date'   => $checkOut,
+                    'status'           => 'pending_payment',
+                    'total_price'      => $totalPrice,
+                    'payment_deadline' => now()->addHours(6),
+                ]);
+
+                RoomBlock::create([
+                    'room_id'    => $room->id,
+                    'start_date' => $checkIn,
+                    'end_date'   => $checkOut,
+                    'reason'     => 'booking',
+                ]);
+
+                return $booking;
+            });
+            try {
+                WhatsApp::sendBookingConfirmation(
+                    $user->phone,
+                    $booking->booking_code,
+                    $room->name,
+                    $totalPrice,
+                    $booking->payment_deadline
+                );
+            } catch (\Throwable $e) {
+                Log::error('Failed to send WA booking confirmation', [
+                    'booking_id' => $booking->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            return response()->json($booking, 201);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
     }
+
 
 
 
