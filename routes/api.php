@@ -82,7 +82,8 @@ Route::middleware(['auth:sanctum', RoleMiddleware::class. ':admin'])
     Route::post('/ratings/{id}/toggle', [AdminRatingController::class, 'toggleVisibility']);
 
 
-    Route::get('/dashboard', [ReportController::class, 'dahsboard']);
+    Route::get('/dashboard', [ReportController::class, 'dashboard']);
+
     // REPORTS
     Route::prefix('reports')->group(function () {
         Route::get('/weekly-chart', [ReportController::class, 'weeklyChart']);
