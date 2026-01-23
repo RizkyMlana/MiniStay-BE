@@ -36,6 +36,7 @@ class BookingController extends Controller
                 $q->where('check_in_date', '<', $checkOut)
                   ->where('check_out_date', '>', $checkIn);
             })
+            ->lockForUpdate()
             ->exists();
 
         if ($conflictBooking) {
