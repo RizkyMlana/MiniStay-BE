@@ -19,19 +19,5 @@ class UserSeeder extends Seeder
             'password' => Hash::make('admin123'),
             'role' => 'admin',
         ]);
-
-        $names = [
-            'Andi', 'Budi', 'Citra', 'Dewi', 'Eka',
-            'Fajar', 'Gina', 'Hendra', 'Indah', 'Joko',
-        ];
-
-        foreach ($names as $i => $name) {
-            User::create([
-                'name' => $name,
-                'phone' => '62812' . rand(10000000, 99999999),
-                'password' => Hash::make('password'),
-                'role' => 'user',
-            ]);
-        }
     }
 }
