@@ -72,8 +72,8 @@ Route::middleware(['auth:sanctum', RoleMiddleware::class. ':admin'])
 
 
     Route::get('/calendar', [CalendarController::class, 'calendar']);
-    Route::post('/room-blocks', [CalendarController::class, 'store']);
-    Route::delete('/room-blocks/{id}', [CalendarController::class, 'destroy']);
+    Route::post('/room-blocks', [CalendarController::class, 'storeBlock']);
+    Route::delete('/room-blocks/{id}', [CalendarController::class, 'deleteBlock']);
 
     // BOOKINGS (ADMIN)
     Route::get('/bookings', [BookingController::class, 'index']);
