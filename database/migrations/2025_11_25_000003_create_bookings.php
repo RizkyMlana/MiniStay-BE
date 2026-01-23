@@ -26,6 +26,9 @@ return new class extends Migration
                 'completed',
             ]);
             $table->unsignedInteger('total_price');
+            $table->enum('payment_method', [
+                "manual_transfer"
+            ]);
             $table->timestamp('payment_deadline')->nullable();
             $table->timestamps();
 
