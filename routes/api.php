@@ -59,8 +59,11 @@ Route::middleware(['auth:sanctum', RoleMiddleware::class. ':admin'])
 
     // ROOM IMAGES
     Route::post('/rooms/{roomId}/images', [RoomImageController::class, 'store']);
+    Route::get('/rooms/{roomId}/images', [RoomImageController::class, 'index']);
+
     Route::post('/room-images/{id}/cover', [RoomImageController::class, 'setCover']);
     Route::delete('/room-images/{id}', [RoomImageController::class, 'destroy']);
+    Route::put('/rooms/{roomId}/images', [RoomImageController::class, 'update']);
 
     // ROOM BLOCKS
     Route::post('/room-blocks', [RoomBlockController::class, 'store']);

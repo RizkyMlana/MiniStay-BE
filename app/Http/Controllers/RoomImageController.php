@@ -57,5 +57,16 @@ class RoomImageController extends Controller
         RoomImage::findOrFail($id)->delete();
         return response()->json(['message' => 'Image deleted']);
     }
+
+    public function index($roomId)
+    {
+        $images = RoomImage::where('room_id', $roomId)
+            ->orderByDesc('is_cover')
+            ->orderBy('created_at')
+            ->get();
+
+        return response()->json($images);
+    }
+
     
 }
